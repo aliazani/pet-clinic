@@ -1,31 +1,37 @@
 package com.learning.petclinic.service.map;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.learning.petclinic.model.BaseEntity;
 
-public abstract class AbstractMapService<T, ID> {
-    protected Map<ID, T> map = new HashMap<>();
+import java.util.*;
+
+public abstract class AbstractMapService<T extends BaseEntity, I extends Long> {
+    protected Map<Long, T> map = new HashMap<>();
 
     Set<T> findAll() {
         return new HashSet<>(map.values());
     }
 
-    T findById(ID id) {
+    T findById(I id) {
         return map.get(id);
     }
 
-    T save(ID id, T item) {
-        map.put(id, item);
+    T save(T item) {
+        if (item != null && item.getId() == null) {
+            item.setId(getNextId());
+            map.put(item.getId(), item);
+        }
         return item;
     }
 
-    void deleteById(ID id) {
+    void deleteById(I id) {
         map.remove(id);
     }
 
     void delete(T item) {
         map.entrySet().removeIf(entry -> entry.getValue().equals(item));
+    }
+
+    private Long getNextId() {
+        return map.size() + 1L;
     }
 }
