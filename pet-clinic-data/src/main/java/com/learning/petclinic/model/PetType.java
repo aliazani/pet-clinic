@@ -1,13 +1,9 @@
 package com.learning.petclinic.model;
 
-public class PetType extends BaseEntity {
-    private String name;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+@Entity
+@Table(name = "pet_types")
+public class PetType extends NamedEntity {
 }
