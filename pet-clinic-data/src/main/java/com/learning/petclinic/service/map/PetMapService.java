@@ -34,15 +34,7 @@ public class PetMapService extends AbstractMapService<Pet, Long> implements PetS
 
     @Override
     public Pet save(Pet item) {
-        if (item.getVisits() != null) {
-            item.getVisits().forEach(visit -> {
-                if (visit.getId() == null)
-                    visit.setId(visitService.save(visit).getId());
-            });
-
-            return super.save(item);
-        }
-        return null;
+        return super.save(item);
     }
 
     @Override
