@@ -67,7 +67,7 @@ class VetControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/vets/", "/vets/index", "/vets/index.html"})
+    @ValueSource(strings = {"/vets/", "/vets/vetList", "/vets/vetList.html"})
     void listVets(String path) throws Exception {
         // given
         given(vetService.findAll()).willReturn(vets);
@@ -75,7 +75,7 @@ class VetControllerTest {
         // then
         mockMvc.perform(get(path))
                 .andExpect(status().isOk())
-                .andExpect(view().name("vets/index"))
+                .andExpect(view().name("vets/vetList"))
                 .andExpect(model().attribute("vets", hasSize(2)))
         ;
     }
