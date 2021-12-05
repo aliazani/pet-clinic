@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -22,7 +23,9 @@ public class OwnerJpaService implements OwnerService {
     @Transactional
     @Override
     public Set<Owner> findAll() {
-        return (Set<Owner>) ownerRepository.findAll();
+        Set<Owner> owners = new HashSet<>();
+        ownerRepository.findAll().forEach(owners::add);
+        return owners;
     }
 
     @Transactional
