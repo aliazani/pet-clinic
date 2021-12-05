@@ -26,27 +26,26 @@ public class OwnerController {
 
     @GetMapping("/find")
     public String findOwners(Model model) {
-        model.addAttribute("ownerDto", OwnerDto.builder().build());
+        model.addAttribute("owner", OwnerDto.builder().build());
 
         return "owners/findOwners";
     }
 
     @GetMapping()
-    public String processFindForm(OwnerDto ownerDto, BindingResult result, Model model) {
-        if (ownerDto.getLastName() == null)
-            ownerDto.setLastName("");
-        Set<Owner> results = ownerService.findAllByLastNameLike(ownerDto.getLastName());
+    public String processFindForm(OwnerDto owner, BindingResult result, Model model) {
+        if (owner.getLastName() == null)
+            owner.setLastName("");
+        Set<Owner> results = ownerService.findAllByLastNameLike(owner.getLastName());
 
         if (results.isEmpty()) {
             result.rejectValue("lastName", "notFound", "notFound");
 
             return "owners/findOwners";
         } else if (results.size() == 1) {
-            Owner owner = results.iterator().next();
-            ownerDto = ownerMapper.ownerToOwnerDto(owner);
-            ownerDto.setId(owner.getId());
+            owner = ownerMapper.ownerToOwnerDto(results.iterator().next());
+            owner.setId(owner.getId());
 
-            return "redirect:/owners/" + ownerDto.getId();
+            return "redirect:/owners/" + owner.getId();
         } else {
             model.addAttribute("owners", results);
 
