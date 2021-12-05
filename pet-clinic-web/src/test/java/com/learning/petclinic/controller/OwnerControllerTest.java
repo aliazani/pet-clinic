@@ -91,7 +91,7 @@ class OwnerControllerTest {
         mockMvc.perform(get("/owners/find"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("owners/findOwners"))
-                .andExpect(model().attributeExists("owner"))
+                .andExpect(model().attributeExists("ownerDto"))
         ;
         verifyNoInteractions(ownerService);
     }
@@ -110,7 +110,7 @@ class OwnerControllerTest {
                 .telephone(ownerDto1.getTelephone())
                 .build();
         oneOwner.add(owner1);
-        given(ownerService.findAllByLastNameLike("Dow")).willReturn(oneOwner);
+        given(ownerService.findAllByLastNameLikeIgnoreCase("dow")).willReturn(oneOwner);
         given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
         // when
         // then
@@ -119,7 +119,7 @@ class OwnerControllerTest {
                 .andExpect(view().name("redirect:/owners/" + ownerDto1.getId()))
         ;
 
-        verify(ownerService, times(1)).findAllByLastNameLike("Dow");
+        verify(ownerService, times(1)).findAllByLastNameLikeIgnoreCase("dow");
     }
 
     @DisplayName("findOwners - whenCalled - returnsManyOwners")
@@ -145,7 +145,7 @@ class OwnerControllerTest {
                 .build();
         manyOwners.add(owner2);
         manyOwners.add(owner3);
-        given(ownerService.findAllByLastNameLike("For")).willReturn(manyOwners);
+        given(ownerService.findAllByLastNameLikeIgnoreCase("for")).willReturn(manyOwners);
         // when
         // then
         mockMvc.perform(get("/owners?lastName=" + ownerDto2.getLastName()))
@@ -153,7 +153,7 @@ class OwnerControllerTest {
                 .andExpect(view().name("owners/ownersList"))
                 .andExpect(model().attribute("owners", hasSize(2)))
         ;
-        verify(ownerService, times(1)).findAllByLastNameLike("For");
+        verify(ownerService, times(1)).findAllByLastNameLikeIgnoreCase("for");
     }
 
     @Test

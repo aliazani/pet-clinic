@@ -125,31 +125,31 @@ class OwnerJpaServiceTest {
         verify(ownerRepository, times(1)).findByLastName("NonExistent");
     }
 
-    @DisplayName(value = "findAllByLastNameLike - existentLastName - returnsEmptySet")
+    @DisplayName(value = "findAllByLastNameLikeIgnoreCase_existent - existentLastName - returnsEmptySet")
     @Test
-    void findAllByLastNameLike_existent() {
+    void findAllByLastNameLikeIgnoreCase_existent() {
         // given
-        Set<Owner> returnedFoundOwners = new HashSet<Owner>();
+        Set<Owner> returnedFoundOwners = new HashSet<>();
         returnedFoundOwners.add(owner1);
         returnedFoundOwners.add(owner2);
-        given(ownerRepository.findAllByLastNameLike("Stallman")).willReturn(returnedFoundOwners);
+        given(ownerRepository.findAllByLastNameContainingIgnoreCase("Stallman")).willReturn(returnedFoundOwners);
         // when
-        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLike("Stallman");
+        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLikeIgnoreCase("Stallman");
         // then
         assertEquals(2, foundOwners.size());
-        verify(ownerRepository, times(1)).findAllByLastNameLike("Stallman");
+        verify(ownerRepository, times(1)).findAllByLastNameContainingIgnoreCase("Stallman");
     }
 
-    @DisplayName(value = "findAllByLastNameLike - nonExistentLastName - returnsEmptySet")
+    @DisplayName(value = "findAllByLastNameLikeIgnoreCase_nonExistent - nonExistentLastName - returnsEmptySet")
     @Test
-    void findAllByLastNameLike_nonExistent() {
+    void findAllByLastNameLikeIgnoreCase_nonExistent() {
         // given
-        given(ownerRepository.findAllByLastNameLike("NonExistent")).willReturn(new HashSet<Owner>());
+        given(ownerRepository.findAllByLastNameContainingIgnoreCase("NonExistent")).willReturn(new HashSet<Owner>());
         // when
-        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLike("NonExistent");
+        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLikeIgnoreCase("NonExistent");
         // then
         assertThat(foundOwners).isEmpty();
-        verify(ownerRepository, times(1)).findAllByLastNameLike("NonExistent");
+        verify(ownerRepository, times(1)).findAllByLastNameContainingIgnoreCase("NonExistent");
     }
 
     @Test
