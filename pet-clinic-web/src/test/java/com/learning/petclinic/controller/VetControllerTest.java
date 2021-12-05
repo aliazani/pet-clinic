@@ -76,7 +76,7 @@ class VetControllerTest {
         mockMvc.perform(get(path))
                 .andExpect(status().isOk())
                 .andExpect(view().name("vets/index"))
-                .andExpect(model().attribute("listVets", hasSize(2)))
+                .andExpect(model().attribute("vets", hasSize(2)))
         ;
     }
 }
