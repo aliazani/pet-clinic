@@ -18,8 +18,9 @@ class PetTypeMapServiceTest {
     void setUp() {
         petTypeMapService = new PetTypeMapService();
 
-        petType = new PetType();
-        petType.setName("Lion");
+        petType = PetType.builder()
+                .name("Lion")
+                .build();
 
         petTypeMapService.save(petType);
     }
@@ -79,8 +80,9 @@ class PetTypeMapServiceTest {
     void save() {
         // given
         Long id = 2L;
-        PetType petType2 = new PetType();
-        petType2.setName("Bird");
+        PetType petType2 = PetType.builder()
+                .name("Bird")
+                .build();
         // when
         PetType savedPetType = petTypeMapService.save(petType2);
         // then

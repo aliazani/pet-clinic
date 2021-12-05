@@ -34,8 +34,10 @@ class PetTypeJpaServiceTest {
 
     @BeforeEach
     void setUp() {
-        dog = new PetType();
-        dog.setName("Dog");
+        dog = PetType.builder()
+                .id(1L)
+                .name("Dog")
+                .build();
     }
 
     @Test
@@ -55,7 +57,6 @@ class PetTypeJpaServiceTest {
     @Test
     void findById() {
         // given
-        dog.setId(1L);
         given(petTypeRepository.findById(1L)).willReturn(Optional.ofNullable(dog));
         // when
         PetType foundPetType = petTypeJpaService.findById(1L);

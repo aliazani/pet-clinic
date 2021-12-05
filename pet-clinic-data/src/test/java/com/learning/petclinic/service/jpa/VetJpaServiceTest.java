@@ -1,6 +1,5 @@
 package com.learning.petclinic.service.jpa;
 
-import com.learning.petclinic.model.Pet;
 import com.learning.petclinic.model.Speciality;
 import com.learning.petclinic.model.Vet;
 import com.learning.petclinic.repository.VetRepository;
@@ -39,11 +38,14 @@ class VetJpaServiceTest {
 
     @BeforeEach
     void setUp() {
-        Speciality speciality = new Speciality();
-        speciality.setName("Surgery");
+        Speciality speciality = Speciality.builder()
+                .id(1L)
+                .name("Surgery")
+                .build();
         specialityJpaService.save(speciality);
 
         vet = Vet.builder()
+                .id(1L)
                 .firstName("Majid")
                 .lastName("Samie")
                 .specialities(specialityJpaService.findAll())
@@ -67,7 +69,6 @@ class VetJpaServiceTest {
     @Test
     void findById() {
         // given
-        vet.setId(1L);
         given(vetRepository.findById(1L)).willReturn(Optional.ofNullable(vet));
         // when
         Vet foundVet = vetJpaService.findById(1L);

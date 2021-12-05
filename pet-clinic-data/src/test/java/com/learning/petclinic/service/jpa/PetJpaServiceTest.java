@@ -50,6 +50,7 @@ class PetJpaServiceTest {
         petTypeJpaService.save(dog);
 
         owner = Owner.builder()
+                .id(1L)
                 .firstName("Richard")
                 .lastName("Stallman")
                 .city("New York")
@@ -59,6 +60,7 @@ class PetJpaServiceTest {
         ownerJpaService.save(owner);
 
         pet = Pet.builder()
+                .id(1L)
                 .name("Gorge")
                 .birthDate(LocalDate.now())
                 .owner(owner)
@@ -83,7 +85,6 @@ class PetJpaServiceTest {
     @Test
     void findById() {
         // given
-        pet.setId(1L);
         given(petRepository.findById(1L)).willReturn(Optional.ofNullable(pet));
         // when
         Pet foundPet = petJpaService.findById(1L);

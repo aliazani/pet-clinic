@@ -17,8 +17,9 @@ class SpecialityMapServiceTest {
     void setUp() {
         specialityMapService = new SpecialityMapService();
 
-        speciality = new Speciality();
-        speciality.setName("Surgery");
+        speciality = Speciality.builder()
+                .name("Surgery")
+                .build();
 
         specialityMapService.save(speciality);
     }
@@ -78,8 +79,9 @@ class SpecialityMapServiceTest {
     void save() {
         // given
         Long id = 2L;
-        Speciality speciality2 = new Speciality();
-        speciality2.setName("Dentistry");
+        Speciality speciality2 = Speciality.builder()
+                .name("Dentistry")
+                .build();
         // when
         Speciality savedSpeciality = specialityMapService.save(speciality2);
         // then

@@ -20,8 +20,9 @@ class PetMapServiceTest {
     void setUp() {
         petMapService = new PetMapService(new VisitMapService());
 
-        dog = new PetType();
-        dog.setName("dog");
+        dog = PetType.builder()
+                .name("dog")
+                .build();
 
         pet = Pet.builder()
                 .name("doggy")
