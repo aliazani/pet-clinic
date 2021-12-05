@@ -4,13 +4,15 @@ import com.learning.petclinic.model.*;
 import com.learning.petclinic.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Component
 @Slf4j
-public class DataLoader implements CommandLineRunner {
+@Profile("map")
+public class MapDataLoader implements CommandLineRunner {
     private final OwnerService ownerService;
     private final VetService vetService;
     private final PetTypeService petTypeService;
@@ -18,9 +20,9 @@ public class DataLoader implements CommandLineRunner {
     private final SpecialityService specialityService;
     private final VisitService visitService;
 
-    public DataLoader(OwnerService ownerService, VetService vetService,
-                      PetTypeService petTypeService, PetService petService,
-                      SpecialityService specialityService, VisitService visitService) {
+    public MapDataLoader(OwnerService ownerService, VetService vetService,
+                         PetTypeService petTypeService, PetService petService,
+                         SpecialityService specialityService, VisitService visitService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
@@ -35,12 +37,14 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadData() {
-        PetType dog = new PetType();
-        dog.setName("Dog");
+        PetType dog = PetType.builder()
+                .name("Dog")
+                .build();
         petTypeService.save(dog);
 
-        PetType cat = new PetType();
-        dog.setName("Cat");
+        PetType cat = PetType.builder()
+                .name("Cat")
+                .build();
         petTypeService.save(cat);
 
         Owner owner1 = new Owner();
@@ -66,6 +70,7 @@ public class DataLoader implements CommandLineRunner {
 
         ownerService.save(owner1);
         petService.save(owner1Pet);
+        visitService.save(owner1PetVisit1);
 
         Owner owner2 = new Owner();
         owner2.setFirstName("Markus");
@@ -79,8 +84,6 @@ public class DataLoader implements CommandLineRunner {
         owner2Pet.setPetType(cat);
         owner2Pet.setOwner(owner2);
         owner2Pet.setBirthDate(LocalDate.now());
-        ownerService.save(owner2);
-        petService.save(owner2Pet);
 
         Visit owner2PetVisit1 = new Visit();
         owner2PetVisit1.setDate(LocalDate.now());
@@ -92,15 +95,14 @@ public class DataLoader implements CommandLineRunner {
         owner2PetVisit2.setDescription("second visit to the broken legs.");
         owner2PetVisit2.setPet(owner2Pet);
 
-        visitService.save(owner2PetVisit1);
-        visitService.save(owner2PetVisit2);
-
         owner2Pet.getVisits().add(owner2PetVisit1);
         owner2Pet.getVisits().add(owner2PetVisit2);
         owner2.getPets().add(owner2Pet);
 
         ownerService.save(owner2);
         petService.save(owner2Pet);
+        visitService.save(owner2PetVisit1);
+        visitService.save(owner2PetVisit2);
 
         Owner owner3 = new Owner();
         owner3.setFirstName("Jeff");
@@ -123,10 +125,9 @@ public class DataLoader implements CommandLineRunner {
         owner3.getPets().add(owner3Pet);
         owner3Pet.getVisits().add(owner3PetVisit1);
 
-        visitService.save(owner3PetVisit1);
-
-        petService.save(owner3Pet);
         ownerService.save(owner3);
+        petService.save(owner3Pet);
+        visitService.save(owner3PetVisit1);
 
         Speciality surgery = new Speciality();
         surgery.setName("Surgery");
@@ -144,6 +145,7 @@ public class DataLoader implements CommandLineRunner {
         Vet vet1 = new Vet();
         vet1.setFirstName("Robert");
         vet1.setLastName("Jobs");
+
         vet1.getSpecialities().add(radiology);
         vet1.getSpecialities().add(dentistry);
         vetService.save(vet1);
@@ -151,6 +153,7 @@ public class DataLoader implements CommandLineRunner {
         Vet vet2 = new Vet();
         vet2.setFirstName("Mary");
         vet2.setLastName("Curious");
+
         vet2.getSpecialities().add(surgery);
         vet2.getSpecialities().add(radiology);
         vetService.save(vet2);
