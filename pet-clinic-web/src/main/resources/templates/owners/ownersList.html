@@ -30,9 +30,17 @@
           <td th:text="${owner.address}">Address</td>
           <td th:text="${owner.city}">City</td>
           <td th:text="${owner.telephone}">Telephone</td>
-          <td th:text="${#strings.listJoin(owner.pets.toArray(), ', ')}">
-            Pets
+          <td th:switch="${owner.pets == null}">
+            <span th:case="${true}" th:text="' '">None</span>
+            <span th:case="*">
+              <span th:each="pet : ${owner.pets}" th:text="${pet.name + ' '}">
+                Pets
+              </span>
+            </span>
           </td>
+          <!--          <td th:text="${#strings.listJoin(owner.pets.toArray(), ', ')}">-->
+          <!--            Pets-->
+          <!--          </td>-->
         </tr>
       </tbody>
     </table>
