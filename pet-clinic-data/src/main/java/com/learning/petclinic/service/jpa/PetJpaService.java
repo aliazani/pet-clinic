@@ -6,6 +6,7 @@ import com.learning.petclinic.service.PetService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Set;
 
 @Service
@@ -17,26 +18,31 @@ public class PetJpaService implements PetService {
         this.petRepository = petRepository;
     }
 
+    @Transactional
     @Override
     public Set<Pet> findAll() {
         return (Set<Pet>) petRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Pet findById(Long id) {
         return petRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     @Override
     public Pet save(Pet item) {
         return petRepository.save(item);
     }
 
+    @Transactional
     @Override
     public void delete(Pet item) {
         petRepository.delete(item);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         petRepository.deleteById(id);
