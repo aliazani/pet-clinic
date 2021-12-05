@@ -13,8 +13,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class VetDto extends PersonDto {
     @Builder
-    public VetDto(String firstName, String lastName, Set<SpecialityDto> specialities) {
-        super(firstName, lastName);
+    public VetDto(Long id, String firstName, String lastName, Set<SpecialityDto> specialities) {
+        super(id, firstName, lastName);
         this.specialities = specialities;
     }
 

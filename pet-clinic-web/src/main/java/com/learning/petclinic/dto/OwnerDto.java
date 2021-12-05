@@ -11,9 +11,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class OwnerDto extends PersonDto {
     @Builder
-    public OwnerDto(String firstName, String lastName, String address,
+    public OwnerDto(Long id, String firstName, String lastName, String address,
                     String city, String telephone, Set<PetDto> pets) {
-        super(firstName, lastName);
+        super(id, firstName, lastName);
         this.address = address;
         this.city = city;
         this.telephone = telephone;

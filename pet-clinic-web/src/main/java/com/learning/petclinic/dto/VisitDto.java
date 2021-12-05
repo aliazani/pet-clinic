@@ -9,8 +9,15 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class VisitDto extends BaseDto {
+    @Builder
+    public VisitDto(Long id, LocalDate date, String description, PetDto pet) {
+        super(id);
+        this.date = date;
+        this.description = description;
+        this.pet = pet;
+    }
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String description;

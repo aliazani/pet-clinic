@@ -15,8 +15,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class PetDto extends NamedDto {
     @Builder
-    public PetDto(String name, LocalDate birthDate, PetTypeDto petType, OwnerDto owner, Set<VisitDto> visits) {
-        super(name);
+    public PetDto(Long id, String name, LocalDate birthDate, PetTypeDto petType, OwnerDto owner, Set<VisitDto> visits) {
+        super(id, name);
         this.birthDate = birthDate;
         this.petType = petType;
         this.owner = owner;
