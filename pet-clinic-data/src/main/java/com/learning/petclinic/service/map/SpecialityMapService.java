@@ -22,6 +22,10 @@ public class SpecialityMapService extends AbstractMapService<Speciality, Long> i
 
     @Override
     public Speciality save(Speciality item) {
+        if (map.get(item.getId()) != null) {
+            var existentItem = map.get(item.getId());
+            existentItem.setName(item.getName());
+        }
         return super.save(item);
     }
 

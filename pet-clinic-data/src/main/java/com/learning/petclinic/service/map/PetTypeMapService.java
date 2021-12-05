@@ -22,6 +22,10 @@ public class PetTypeMapService extends AbstractMapService<PetType, Long> impleme
 
     @Override
     public PetType save(PetType item) {
+        if (map.get(item.getId()) != null) {
+            var existentItem = map.get(item.getId());
+            existentItem.setName(item.getName());
+        }
         return super.save(item);
     }
 
