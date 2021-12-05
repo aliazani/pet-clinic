@@ -10,4 +10,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class BaseDto implements Serializable {
     private Long id;
+
+    public boolean isNew() {
+        return this.id == null;
+    }
 }
