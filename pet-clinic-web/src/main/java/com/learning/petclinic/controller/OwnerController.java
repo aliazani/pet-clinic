@@ -50,7 +50,6 @@ public class OwnerController {
                             Set<PetDto> petDtos = new HashSet<>();
                             owner.getPets().forEach(pet -> petDtos.add(petMapper.petToPetDto(pet)));
 
-                            System.out.println(petDtos);
                             ownerDto1.setPets(petDtos);
                             results.add(ownerDto1);
 
