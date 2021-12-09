@@ -2,8 +2,10 @@ package com.learning.petclinic.controller;
 
 import com.learning.petclinic.dto.OwnerDto;
 import com.learning.petclinic.dto.PetDto;
+import com.learning.petclinic.dto.VisitDto;
 import com.learning.petclinic.mapper.OwnerMapper;
 import com.learning.petclinic.mapper.PetMapper;
+import com.learning.petclinic.mapper.VisitMapper;
 import com.learning.petclinic.model.Owner;
 import com.learning.petclinic.service.OwnerService;
 import org.springframework.stereotype.Controller;
@@ -25,11 +27,13 @@ public class OwnerController {
     private final OwnerService ownerService;
     private final PetMapper petMapper;
     private final OwnerMapper ownerMapper;
+    private final VisitMapper visitMapper;
 
-    public OwnerController(OwnerService ownerService, PetMapper petMapper, OwnerMapper ownerMapper) {
+    public OwnerController(OwnerService ownerService, PetMapper petMapper, OwnerMapper ownerMapper, VisitMapper visitMapper) {
         this.ownerService = ownerService;
         this.petMapper = petMapper;
         this.ownerMapper = ownerMapper;
+        this.visitMapper = visitMapper;
     }
 
     @GetMapping("/find")
@@ -48,7 +52,13 @@ public class OwnerController {
                 .forEach(owner -> {
                             OwnerDto ownerDto1 = ownerMapper.ownerToOwnerDto(owner);
                             Set<PetDto> petDtos = new HashSet<>();
-                            owner.getPets().forEach(pet -> petDtos.add(petMapper.petToPetDto(pet)));
+                            owner.getPets().forEach(pet -> {
+                                Set<VisitDto> visitDtos = new HashSet<>();
+                                pet.getVisits().forEach(visit -> visitDtos.add(visitMapper.visitToVisitDto(visit)));
+                                PetDto petDto = petMapper.petToPetDto(pet);
+                                petDto.setVisits(visitDtos);
+                                petDtos.add(petDto);
+                            });
 
                             ownerDto1.setPets(petDtos);
                             results.add(ownerDto1);
@@ -74,15 +84,7 @@ public class OwnerController {
 
     @GetMapping("/{ownerId}")
     public String showOwner(@PathVariable("ownerId") Long id, Model model) {
-        Owner owner = ownerService.findById(id);
-
-        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(owner);
-        Set<PetDto> petDtos = new HashSet<>();
-        owner.getPets().forEach(pet -> petDtos.add(petMapper.petToPetDto(pet)));
-        ownerDto.setPets(petDtos);
-
-        model.addAttribute("ownerDto", ownerDto);
-        return VIEWS_OWNER_DETAILS;
+        return findOwner(id, model, VIEWS_OWNER_DETAILS);
     }
 
     @GetMapping("/new")
@@ -105,10 +107,24 @@ public class OwnerController {
 
     @GetMapping("/{ownerId}/edit")
     public String initUpdateFrom(@PathVariable("ownerId") Long id, Model model) {
-        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(ownerService.findById(id));
+        return findOwner(id, model, VIEWS_OWNER_CREATE_OR_UPDATE_FORM);
+    }
+
+    private String findOwner(@PathVariable("ownerId") Long id, Model model, String viewsOwnerCreateOrUpdateForm) {
+        Owner owner = ownerService.findById(id);
+        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(owner);
+        Set<PetDto> petDtos = new HashSet<>();
+        owner.getPets().forEach(pet -> {
+            Set<VisitDto> visitDtos = new HashSet<>();
+            pet.getVisits().forEach(visit -> visitDtos.add(visitMapper.visitToVisitDto(visit)));
+            PetDto petDto = petMapper.petToPetDto(pet);
+            petDto.setVisits(visitDtos);
+            petDtos.add(petDto);
+        });
+        ownerDto.setPets(petDtos);
         model.addAttribute("ownerDto", ownerDto);
 
-        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+        return viewsOwnerCreateOrUpdateForm;
     }
 
     @PostMapping("/{ownerId}/edit")
