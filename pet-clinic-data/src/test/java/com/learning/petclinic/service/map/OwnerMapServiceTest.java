@@ -54,7 +54,6 @@ class OwnerMapServiceTest {
         // given
         // when
         Set<Owner> owners = ownerMapService.findAll();
-        System.out.println(owners);
         //then
         assertEquals(3, owners.size());
     }
