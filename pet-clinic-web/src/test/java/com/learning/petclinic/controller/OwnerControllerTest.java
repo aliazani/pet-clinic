@@ -220,6 +220,19 @@ class OwnerControllerTest {
     @Test
     void showOwner() throws Exception {
         // given
+        Pet pet1 = Pet.builder()
+                .name("Gorge")
+                .birthDate(LocalDate.now())
+                .build();
+
+        PetDto petDto1 = PetDto.builder()
+                .name(pet1.getName())
+                .birthDate(pet1.getBirthDate())
+                .build();
+        Set<Pet> owner1Pets = new HashSet<>();
+        owner1Pets.add(pet1);
+
+
         Owner owner1 = Owner.builder()
                 .id(ownerDto1.getId())
                 .firstName(ownerDto1.getFirstName())
@@ -227,10 +240,12 @@ class OwnerControllerTest {
                 .city(ownerDto1.getCity())
                 .address(ownerDto1.getAddress())
                 .telephone(ownerDto1.getTelephone())
+                .pets(owner1Pets)
                 .build();
 
         given(ownerService.findById(1L)).willReturn(owner1);
         given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
+        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
         // when
         // then
         mockMvc.perform(get("/owners/1"))
