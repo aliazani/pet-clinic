@@ -19,26 +19,29 @@
       </thead>
 
       <tbody>
-        <tr th:each="owner : ${owners}">
+        <tr th:each="ownerDto : ${ownerDtos}">
           <td>
             <a
-              th:href="@{/owners/__${owner.id}__}"
-              th:text="${owner.firstName + ' ' + owner.lastName}"
+              th:href="@{/owners/__${ownerDto.id}__}"
+              th:text="${ownerDto.firstName + ' ' + ownerDto.lastName}"
               >Owner</a
             >
           </td>
-          <td th:text="${owner.address}">Address</td>
-          <td th:text="${owner.city}">City</td>
-          <td th:text="${owner.telephone}">Telephone</td>
-          <td th:switch="${owner.pets == null}">
+          <td th:text="${ownerDto.address}">Address</td>
+          <td th:text="${ownerDto.city}">City</td>
+          <td th:text="${ownerDto.telephone}">Telephone</td>
+          <td th:switch="${ownerDto.pets == null}">
             <span th:case="${true}" th:text="' '">None</span>
             <span th:case="*">
-              <span th:each="pet : ${owner.pets}" th:text="${pet.name + ' '}">
+              <span
+                th:each="pet : ${ownerDto.pets}"
+                th:text="${pet.name + ' '}"
+              >
                 Pets
               </span>
             </span>
           </td>
-          <!--          <td th:text="${#strings.listJoin(owner.pets.toArray(), ', ')}">-->
+          <!--          <td th:text="${#strings.listJoin(ownerDto.pets.toArray(), ', ')}">-->
           <!--            Pets-->
           <!--          </td>-->
         </tr>
@@ -48,27 +51,27 @@
     <!--    <span>Pages:</span>-->
     <!--    <span>[</span>-->
     <!--    <span th:each="i: ${#numbers.sequence(1, totalPages)}">-->
-    <!--      <a th:if="${currentPage != i}" th:href="@{'/owners/?page=' + ${i}}">[[${i}]]</a>-->
+    <!--      <a th:if="${currentPage != i}" th:href="@{'/ownerDtos/?page=' + ${i}}">[[${i}]]</a>-->
     <!--      <span th:unless="${currentPage != i}">[[${i}]]</span>-->
     <!--    </span>-->
     <!--    <span>]&nbsp;</span>-->
     <!--    <span>-->
-    <!--      <a th:if="${currentPage > 1}" th:href="@{'/owners/?page=1'}" title="First"-->
+    <!--      <a th:if="${currentPage > 1}" th:href="@{'/ownerDtos/?page=1'}" title="First"-->
     <!--         class="fa fa-fast-backward"></a>-->
     <!--      <span th:unless="${currentPage > 1}" title="First" class="fa fa-fast-backward"></span>-->
     <!--    </span>-->
     <!--    <span>-->
-    <!--      <a th:if="${currentPage > 1}" th:href="@{'/owners/?page=' + ${currentPage - 1}}" title="Previous"-->
+    <!--      <a th:if="${currentPage > 1}" th:href="@{'/ownerDtos/?page=' + ${currentPage - 1}}" title="Previous"-->
     <!--         class="fa fa-step-backward"></a>-->
     <!--      <span th:unless="${currentPage > 1}" title="Previous" class="fa fa-step-backward"></span>-->
     <!--    </span>-->
     <!--    <span>-->
-    <!--      <a th:if="${currentPage < totalPages}" th:href="@{'/owners/?page=' + ${currentPage + 1}}" title="Next"-->
+    <!--      <a th:if="${currentPage < totalPages}" th:href="@{'/ownerDtos/?page=' + ${currentPage + 1}}" title="Next"-->
     <!--         class="fa fa-step-forward"></a>-->
     <!--      <span th:unless="${currentPage < totalPages}" title="Next" class="fa fa-step-forward"></span>-->
     <!--    </span>-->
     <!--    <span>-->
-    <!--      <a th:if="${currentPage < totalPages}" th:href="@{'/owners/?page=' + ${totalPages}}" title="Last"-->
+    <!--      <a th:if="${currentPage < totalPages}" th:href="@{'/ownerDtos/?page=' + ${totalPages}}" title="Last"-->
     <!--         class="fa fa-fast-forward"></a>-->
     <!--      <span th:unless="${currentPage < totalPages}" title="Last" class="fa fa-step-forward"></span>-->
     <!--    </span>-->
