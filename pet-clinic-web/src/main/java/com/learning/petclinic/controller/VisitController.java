@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
 
 @Controller
 public class VisitController {
@@ -28,41 +26,42 @@ public class VisitController {
     private final PetMapper petMapper;
     private final VisitMapper visitMapper;
 
-    public VisitController(VisitService visitService, PetService petService, PetMapper petMapper, VisitMapper visitMapper) {
+    public VisitController(VisitService visitService, PetService petService,
+                           PetMapper petMapper, VisitMapper visitMapper) {
         this.visitService = visitService;
         this.petService = petService;
         this.petMapper = petMapper;
         this.visitMapper = visitMapper;
     }
 
-    @ModelAttribute("visitDto")
-    public VisitDto loadPetWithVisit(@PathVariable("petId") Long petId, Model model) {
+    @ModelAttribute("petDto")
+    public PetDto loadPetWithVisit(@PathVariable("petId") Long petId) {
         Pet pet = petService.findById(petId);
 
-        Set<VisitDto> visitDtos = new HashSet<>();
-        pet.getVisits().forEach(visit -> visitDtos.add(visitMapper.visitToVisitDto(visit)));
-        PetDto petDto = petMapper.petToPetDto(pet);
-        petDto.setVisits(visitDtos);
-       
-        model.addAttribute("petDto", petDto);
-        VisitDto visitDto = VisitDto.builder().build();
-        visitDto.setPet(petDto);
-
-        return visitDto;
+        return petMapper.toDTO(pet);
     }
 
     @GetMapping("/owners/*/pets/{petId}/visits/new")
-    public String initNewVisitForm() {
+    public String initNewVisitForm(Model model, @ModelAttribute("petDto") PetDto petDto) {
+        VisitDto visitDto = VisitDto.builder()
+                .pet(petDto)
+                .build();
+        model.addAttribute("visitDto", visitDto);
+
         return VIEW_PET_CREATE_OR_UPDATE_FORM;
     }
 
     @PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-    public String processNewVisitForm(@Valid @ModelAttribute("visitDto") VisitDto visitDto, BindingResult result) {
+    public String processNewVisitForm(@Valid @ModelAttribute("visitDto") VisitDto visitDto,
+                                      @ModelAttribute("petDto") PetDto petDto,
+                                      BindingResult result) {
+        visitDto.setPet(petDto);
         if (result.hasErrors())
             return VIEW_PET_CREATE_OR_UPDATE_FORM;
         else {
-            Visit visit = visitMapper.visitDtoToVisit(visitDto);
+            Visit visit = visitMapper.toEntity(visitDto);
             visitService.save(visit);
+
             return "redirect:/owners/{ownerId}";
         }
     }
