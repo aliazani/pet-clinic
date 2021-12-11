@@ -135,8 +135,8 @@ class PetControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(petController).build();
 
         owner1.setPets(Stream.of(pet1).collect(Collectors.toSet()));
-        given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
-        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
+        given(ownerMapper.toDTO(owner1)).willReturn(ownerDto1);
+        given(petMapper.toDTO(pet1)).willReturn(petDto1);
         given(ownerService.findById(owner1.getId())).willReturn(owner1);
     }
 
@@ -144,8 +144,8 @@ class PetControllerTest {
     void populatePetTypes() {
         // given
         given(petTypeService.findAll()).willReturn(petTypes);
-        given(petTypeMapper.petTypeToPetTypeDto(cat)).willReturn(catDto);
-        given(petTypeMapper.petTypeToPetTypeDto(dog)).willReturn(dogDto);
+        given(petTypeMapper.toDTOSet(Stream.of(dog, cat).collect(Collectors.toSet())))
+                .willReturn(Stream.of(dogDto, catDto).collect(Collectors.toSet()));
         // when
         Set<PetTypeDto> petTypeDtos = petController.populatePetTypes();
         // then
@@ -170,8 +170,8 @@ class PetControllerTest {
     @Test
     void processCreationForm() throws Exception {
         // Given
-        given(ownerMapper.ownerDtoToOwner(ownerDto1)).willReturn(owner1);
-        given(petMapper.petDtoToPet(petDto1)).willReturn(pet1);
+        given(ownerMapper.toEntity(ownerDto1)).willReturn(owner1);
+        given(petMapper.toEntity(petDto1)).willReturn(pet1);
         // When
         // Then
         mockMvc.perform(post("/owners/" + owner1.getId() + "/pets/new")
@@ -201,8 +201,8 @@ class PetControllerTest {
         // Given
         PetDto updatedPetDto1 = petDto1;
         updatedPetDto1.setName("Gorge");
-        given(ownerMapper.ownerDtoToOwner(ownerDto1)).willReturn(owner1);
-        given(petMapper.petDtoToPet(petDto1)).willReturn(pet1);
+        given(ownerMapper.toEntity(ownerDto1)).willReturn(owner1);
+        given(petMapper.toEntity(petDto1)).willReturn(pet1);
         // When
         // Then
         mockMvc.perform(post("/owners/" + owner1.getId() + "/pets/" + pet1.getId() + "/edit")
