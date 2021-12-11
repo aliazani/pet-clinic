@@ -20,6 +20,8 @@ public class PetDto extends NamedDto {
         this.birthDate = birthDate;
         this.petType = petType;
         this.owner = owner;
+        if (visits == null)
+            visits = new HashSet<>();
         this.visits = visits;
     }
 
