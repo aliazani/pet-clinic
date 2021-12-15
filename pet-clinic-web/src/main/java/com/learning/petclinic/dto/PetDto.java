@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +28,8 @@ public class PetDto extends NamedDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
+
+    @NotNull
     private PetTypeDto petType;
     private OwnerDto owner;
     private Set<VisitDto> visits = new HashSet<>();

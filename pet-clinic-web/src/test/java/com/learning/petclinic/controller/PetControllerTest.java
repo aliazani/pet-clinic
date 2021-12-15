@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -111,15 +110,14 @@ class PetControllerTest {
                 .name(cat.getName())
                 .build();
 
-        petTypes = new HashSet<>();
-        petTypes.add(dog);
-        petTypes.add(cat);
+        petTypes = Stream.of(dog, cat).collect(Collectors.toSet());
 
         pet1 = Pet.builder()
                 .id(1L)
                 .name("Kitty")
                 .birthDate(LocalDate.now())
                 .petType(cat)
+                .owner(owner1)
                 .build();
 
         petDto1 = PetDto.builder()
@@ -127,6 +125,7 @@ class PetControllerTest {
                 .name(pet1.getName())
                 .birthDate(pet1.getBirthDate())
                 .petType(catDto)
+                .owner(ownerDto1)
                 .build();
 
         objectMapper = new ObjectMapper();
@@ -172,6 +171,9 @@ class PetControllerTest {
         // Given
         given(ownerMapper.toEntity(ownerDto1)).willReturn(owner1);
         given(petMapper.toEntity(petDto1)).willReturn(pet1);
+        System.out.println("*************************");
+        System.out.println(petDto1.getPetType().getName());
+        System.out.println(pet1.getPetType().getName());
         // When
         // Then
         mockMvc.perform(post("/owners/" + owner1.getId() + "/pets/new")
