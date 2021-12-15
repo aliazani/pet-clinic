@@ -20,6 +20,6 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        run: mvn -B verify --file pom.xml cobertura:cobertura
+        run: mvn -B verify --file pom.xml
       - name: send to codecov
         run: bash <(curl -s https://codecov.io/bash)
