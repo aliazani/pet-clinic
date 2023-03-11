@@ -3,11 +3,13 @@ package com.learning.petclinic.service.jpa;
 import com.learning.petclinic.model.Pet;
 import com.learning.petclinic.repository.PetRepository;
 import com.learning.petclinic.service.PetService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 @Service
+@Profile("jpa")
 public class PetJpaService implements PetService {
     private final PetRepository petRepository;
 
