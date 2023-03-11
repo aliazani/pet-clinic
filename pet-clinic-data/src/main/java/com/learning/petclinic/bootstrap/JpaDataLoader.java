@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -146,16 +149,15 @@ public class JpaDataLoader implements CommandLineRunner {
         Vet vet1 = Vet.builder()
                 .firstName("Robert")
                 .lastName("Jobs")
+                .specialities(Stream.of(radiology, dentistry).collect(Collectors.toCollection(HashSet::new)))
                 .build();
-
-        vet1.setSpecialities(Set.of(radiology, dentistry));
         vetService.save(vet1);
 
         Vet vet2 = Vet.builder()
                 .firstName("Mary")
                 .lastName("Curious")
+                .specialities(Stream.of(surgery, radiology).collect(Collectors.toCollection(HashSet::new)))
                 .build();
-        vet1.setSpecialities(Set.of(surgery, radiology));
         vetService.save(vet2);
 
         log.info("Data loaded successfully ...");

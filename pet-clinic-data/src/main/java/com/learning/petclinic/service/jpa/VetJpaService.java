@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -21,7 +22,9 @@ public class VetJpaService implements VetService {
     @Transactional
     @Override
     public Set<Vet> findAll() {
-        return (Set<Vet>) vetRepository.findAll();
+        Set<Vet> vets = new HashSet<>();
+        vetRepository.findAll().forEach(vets::add);
+        return vets;
     }
 
     @Transactional
