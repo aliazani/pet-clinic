@@ -7,24 +7,22 @@ import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 @Component
-public class PetTypeFormatter implements Formatter<PetTypeDto> {
+public class PetTypeDtoFormatter implements Formatter<PetTypeDto> {
     private final PetTypeService petTypeService;
-    private final PetTypeMapper petTypeMapper;
+    private final PetTypeMapper petTypeMapperBetter;
 
-    public PetTypeFormatter(PetTypeService petTypeService, PetTypeMapper petTypeMapper) {
+    public PetTypeDtoFormatter(PetTypeService petTypeService, PetTypeMapper petTypeMapperBetter) {
         this.petTypeService = petTypeService;
-        this.petTypeMapper = petTypeMapper;
+        this.petTypeMapperBetter = petTypeMapperBetter;
     }
 
     @Override
     public PetTypeDto parse(String text, Locale locale) throws ParseException {
-        Set<PetTypeDto> petTypeDtos = new HashSet<>();
-        petTypeService.findAll().forEach(petType -> petTypeDtos.add(petTypeMapper.petTypeToPetTypeDto(petType)));
+        Set<PetTypeDto> petTypeDtos = petTypeMapperBetter.toDTOSet(petTypeService.findAll());
 
         for (var petTypeDto : petTypeDtos)
             if (petTypeDto.getName().equals(text))

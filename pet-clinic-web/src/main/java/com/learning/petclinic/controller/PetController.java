@@ -3,11 +3,7 @@ package com.learning.petclinic.controller;
 import com.learning.petclinic.dto.OwnerDto;
 import com.learning.petclinic.dto.PetDto;
 import com.learning.petclinic.dto.PetTypeDto;
-import com.learning.petclinic.dto.VisitDto;
-import com.learning.petclinic.mapper.OwnerMapper;
-import com.learning.petclinic.mapper.PetMapper;
-import com.learning.petclinic.mapper.PetTypeMapper;
-import com.learning.petclinic.mapper.VisitMapper;
+import com.learning.petclinic.mapper.*;
 import com.learning.petclinic.model.Owner;
 import com.learning.petclinic.model.Pet;
 import com.learning.petclinic.service.OwnerService;
@@ -19,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.Set;
 
 @Controller
@@ -31,50 +26,38 @@ public class PetController {
     private final OwnerService ownerService;
     private final OwnerMapper ownerMapper;
     private final PetMapper petMapper;
-    private final PetTypeMapper petTypeMapper;
+    private final PetTypeMapper petTypeMapperBetter;
     private final VisitMapper visitMapper;
 
     public PetController(PetService petService, PetTypeService petTypeService
-            , OwnerService ownerService, OwnerMapper ownerMapper, PetMapper petMapper, PetTypeMapper petTypeMapper, VisitMapper visitMapper) {
+            , OwnerService ownerService, OwnerMapper ownerMapper, PetMapper petMapper,
+                         PetTypeMapper petTypeMapperBetter, VisitMapper visitMapper) {
         this.petService = petService;
         this.petTypeService = petTypeService;
         this.ownerService = ownerService;
         this.ownerMapper = ownerMapper;
         this.petMapper = petMapper;
-        this.petTypeMapper = petTypeMapper;
+        this.petTypeMapperBetter = petTypeMapperBetter;
         this.visitMapper = visitMapper;
     }
 
     @ModelAttribute("petTypeDtos")
     public Set<PetTypeDto> populatePetTypes() {
-        Set<PetTypeDto> petTypeDtos = new HashSet<>();
-        petTypeService.findAll().forEach(petType -> petTypeDtos.add(petTypeMapper.petTypeToPetTypeDto(petType)));
-
-        return petTypeDtos;
+        return petTypeMapperBetter.toDTOSet(petTypeService.findAll());
     }
 
     @ModelAttribute("ownerDto")
     public OwnerDto findOwner(@PathVariable("ownerId") Long ownerId) {
         Owner owner = ownerService.findById(ownerId);
-        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(owner);
 
-        Set<PetDto> petDtos = new HashSet<>();
-        owner.getPets().forEach(pet -> {
-            Set<VisitDto> visitDtos = new HashSet<>();
-            pet.getVisits().forEach(visit -> visitDtos.add(visitMapper.visitToVisitDto(visit)));
-            PetDto petDto = petMapper.petToPetDto(pet);
-            petDto.setVisits(visitDtos);
-            petDtos.add(petDto);
-        });
-        ownerDto.setPets(petDtos);
-
-        return ownerDto;
+        return ownerMapper.toDTO(owner);
     }
 
     @GetMapping("/new")
     public String initCreationForm(@ModelAttribute("ownerDto") OwnerDto ownerDto, Model model) {
-        PetDto petDto = PetDto.builder().build();
-        petDto.setOwner(ownerDto);
+        PetDto petDto = PetDto.builder()
+                .owner(ownerDto)
+                .build();
         model.addAttribute("petDto", petDto);
 
         return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
@@ -84,11 +67,12 @@ public class PetController {
     public String processCreationForm(@ModelAttribute("ownerDto") OwnerDto ownerDto,
                                       @ModelAttribute("petDto") @Valid PetDto petDto,
                                       BindingResult result, Model model) {
+        petDto.setOwner(ownerDto);
         if ((!petDto.getName().isEmpty()) &&
                 petDto.isNew() &&
                 Boolean.TRUE.equals(
                         ownerDto.getPets().stream().map(petDto1 -> petDto1.getName().equals(petDto.getName()))
-                                .reduce(false, (hasSameName1, hasSameName2) -> hasSameName1 && hasSameName2)
+                                .reduce(false, (hasSameName1, hasSameName2) -> hasSameName1 || hasSameName2)
                 )
         ) {
             result.rejectValue("name", "duplicate", "already exists");
@@ -100,8 +84,8 @@ public class PetController {
 
             return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
         } else {
-            Owner owner = ownerMapper.ownerDtoToOwner(ownerDto);
-            Pet pet = petMapper.petDtoToPet(petDto);
+            Owner owner = ownerMapper.toEntityNoPet(ownerDto);
+            Pet pet = petMapper.toEntity(petDto);
             pet.setOwner(owner);
             petService.save(pet);
 
@@ -111,11 +95,8 @@ public class PetController {
 
     @GetMapping("/{petId}/edit")
     public String initUpdateForm(@PathVariable("petId") Long petId, Model model) {
-        Pet pet = petService.findById(petId);
-        Set<VisitDto> visitDtos = new HashSet<>();
-        pet.getVisits().forEach(visit -> visitDtos.add(visitMapper.visitToVisitDto(visit)));
-        PetDto petDto = petMapper.petToPetDto(pet);
-        petDto.setVisits(visitDtos);
+        PetDto petDto = petMapper.toDTO(petService.findById(petId));
+
         model.addAttribute("petDto", petDto);
 
         return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
@@ -127,6 +108,7 @@ public class PetController {
                                     @ModelAttribute("petDto") @Valid PetDto petDto,
                                     @PathVariable("petId") Long petId,
                                     BindingResult result, Model model) {
+        petDto.setOwner(ownerDto);
         if (result.hasErrors()) {
             petDto.setOwner(ownerDto);
             model.addAttribute("petDto", petDto);
@@ -134,9 +116,7 @@ public class PetController {
             return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
         } else {
             petDto.setId(petId);
-            Pet pet = petMapper.petDtoToPet(petDto);
-            Owner owner = ownerMapper.ownerDtoToOwner(ownerDto);
-            pet.setOwner(owner);
+            Pet pet = petMapper.toEntity(petDto);
             petService.save(pet);
 
             return "redirect:/owners/" + ownerDto.getId();

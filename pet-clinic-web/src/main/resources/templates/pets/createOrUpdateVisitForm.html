@@ -29,8 +29,11 @@
       </tr>
     </table>
 
-    <form th:object="${visitDto}" class="form-horizontal" method="post">
+    <form th:object="${visitDto}" class="form-horizontal" method="POST">
       <div class="form-group has-feedback">
+        <div style="display: none">
+          <input aria-label="id" th:text="${visitDto.id}" />
+        </div>
         <input
           th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"
         />
