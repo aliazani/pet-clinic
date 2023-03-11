@@ -1,19 +1,31 @@
 package com.learning.petclinic.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 
-public class Pet extends BaseEntity {
-    private String name;
-    private PetType petType;
-    private Owner owner;
+@Entity
+@Table(name = "pets")
+public class Pet extends NamedEntity {
+    @Column(name = "birth_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
-    public String getName() {
-        return name;
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private PetType petType;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
+
+    public LocalDate getBirthDate() {
+        return birthDate;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public PetType getPetType() {
@@ -30,13 +42,5 @@ public class Pet extends BaseEntity {
 
     public void setOwner(Owner owner) {
         this.owner = owner;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
     }
 }
