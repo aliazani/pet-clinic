@@ -13,8 +13,8 @@ import java.util.Set;
 @Table(name = "vets")
 public class Vet extends Person {
     @Builder
-    public Vet(String firstName, String lastName, Set<Speciality> specialities) {
-        super(firstName, lastName);
+    public Vet(Long id, String firstName, String lastName, Set<Speciality> specialities) {
+        super(id, firstName, lastName);
         this.specialities = specialities;
     }
 

@@ -1,9 +1,6 @@
 package com.learning.petclinic.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Getter
@@ -11,6 +8,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PersonDto extends BaseDto {
+    public PersonDto(Long id, String firstName, String lastName) {
+        super(id);
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     private String firstName;
     private String lastName;
 }

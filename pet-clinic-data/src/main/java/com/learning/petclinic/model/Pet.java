@@ -15,8 +15,8 @@ import java.util.Set;
 @Table(name = "pets")
 public class Pet extends NamedEntity {
     @Builder
-    public Pet(String name, LocalDate birthDate, PetType petType, Owner owner, Set<Visit> visits) {
-        super(name);
+    public Pet(Long id, String name, LocalDate birthDate, PetType petType, Owner owner, Set<Visit> visits) {
+        super(id, name);
         this.birthDate = birthDate;
         this.petType = petType;
         this.owner = owner;
