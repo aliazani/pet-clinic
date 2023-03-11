@@ -26,24 +26,22 @@ public class PetController {
     private final OwnerService ownerService;
     private final OwnerMapper ownerMapper;
     private final PetMapper petMapper;
-    private final PetTypeMapper petTypeMapperBetter;
-    private final VisitMapper visitMapper;
+    private final PetTypeMapper petTypeMapper;
 
     public PetController(PetService petService, PetTypeService petTypeService
             , OwnerService ownerService, OwnerMapper ownerMapper, PetMapper petMapper,
-                         PetTypeMapper petTypeMapperBetter, VisitMapper visitMapper) {
+                         PetTypeMapper petTypeMapper) {
         this.petService = petService;
         this.petTypeService = petTypeService;
         this.ownerService = ownerService;
         this.ownerMapper = ownerMapper;
         this.petMapper = petMapper;
-        this.petTypeMapperBetter = petTypeMapperBetter;
-        this.visitMapper = visitMapper;
+        this.petTypeMapper = petTypeMapper;
     }
 
     @ModelAttribute("petTypeDtos")
     public Set<PetTypeDto> populatePetTypes() {
-        return petTypeMapperBetter.toDTOSet(petTypeService.findAll());
+        return petTypeMapper.toDTOSet(petTypeService.findAll());
     }
 
     @ModelAttribute("ownerDto")
