@@ -1,13 +1,7 @@
 package com.learning.petclinic.bootstrap;
 
-import com.learning.petclinic.model.Owner;
-import com.learning.petclinic.model.Pet;
-import com.learning.petclinic.model.PetType;
-import com.learning.petclinic.model.Vet;
-import com.learning.petclinic.service.OwnerService;
-import com.learning.petclinic.service.PetService;
-import com.learning.petclinic.service.PetTypeService;
-import com.learning.petclinic.service.VetService;
+import com.learning.petclinic.model.*;
+import com.learning.petclinic.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -21,23 +15,31 @@ public class DataLoader implements CommandLineRunner {
     private final VetService vetService;
     private final PetTypeService petTypeService;
     private final PetService petService;
+    private final SpecialityService specialityService;
 
-    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, PetService petService) {
+    public DataLoader(OwnerService ownerService, VetService vetService,
+                      PetTypeService petTypeService, PetService petService,
+                      SpecialityService specialityService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
         this.petService = petService;
+        this.specialityService = specialityService;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        loadData();
+    }
+
+    private void loadData() {
         PetType dog = new PetType();
         dog.setName("Dog");
-        PetType savedDog = petTypeService.save(dog);
+        petTypeService.save(dog);
 
         PetType cat = new PetType();
         dog.setName("Cat");
-        PetType savedCat = petTypeService.save(cat);
+        petTypeService.save(cat);
 
         Owner owner1 = new Owner();
         owner1.setFirstName("John");
@@ -73,14 +75,31 @@ public class DataLoader implements CommandLineRunner {
         ownerService.save(owner2);
         petService.save(markusCat);
 
+        Speciality surgery = new Speciality();
+        surgery.setDescription("Surgery");
+
+        Speciality radiology = new Speciality();
+        radiology.setDescription("Radiology");
+
+        Speciality dentistry = new Speciality();
+        dentistry.setDescription("Dentistry");
+
+        specialityService.save(surgery);
+        specialityService.save(radiology);
+        specialityService.save(dentistry);
+
         Vet vet1 = new Vet();
         vet1.setFirstName("Robert");
         vet1.setLastName("Jobs");
+        vet1.getSpecialities().add(radiology);
+        vet1.getSpecialities().add(dentistry);
         vetService.save(vet1);
 
         Vet vet2 = new Vet();
         vet2.setFirstName("Mary");
         vet2.setLastName("Curious");
+        vet2.getSpecialities().add(surgery);
+        vet2.getSpecialities().add(radiology);
         vetService.save(vet2);
 
         log.info("Data loaded successfully ...");
