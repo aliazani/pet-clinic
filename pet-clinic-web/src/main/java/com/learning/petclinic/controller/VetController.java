@@ -15,10 +15,9 @@ public class VetController {
         this.vetService = vetService;
     }
 
-    @GetMapping("")
+    @GetMapping({"", "index", "index.html", "vets.html"})
     public String listVets(Model model) {
         model.addAttribute("listVets", vetService.findAll());
-        vetService.findAll().forEach(vet -> vet.getSpecialities());
         return "vets/index";
     }
 }
