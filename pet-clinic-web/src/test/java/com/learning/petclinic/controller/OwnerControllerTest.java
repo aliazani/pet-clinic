@@ -300,13 +300,12 @@ class OwnerControllerTest {
                 .telephone(ownerDto4.getTelephone())
                 .build();
 
-        given(ownerMapper.ownerDtoToOwner(any())).willReturn(owner4);
+        given(ownerMapper.ownerDtoToOwner(ownerDto4)).willReturn(owner4);
         given(ownerService.save(owner4)).willReturn(owner4);
         // When
         // Then
         mockMvc.perform(post("/owners/new")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(owner4))
+                        .flashAttr("ownerDto", ownerDto4)
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/owners/" + owner4.getId()))
@@ -360,13 +359,21 @@ class OwnerControllerTest {
                 .telephone("2123123890")
                 .build();
 
-        given(ownerMapper.ownerDtoToOwner(any())).willReturn(updatedOwner3);
+        OwnerDto updatedOwnerDto3 = OwnerDto.builder()
+                .id(updatedOwner3.getId())
+                .firstName(updatedOwner3.getFirstName())
+                .lastName(updatedOwner3.getLastName())
+                .city(updatedOwner3.getCity())
+                .address(updatedOwner3.getAddress())
+                .telephone(updatedOwner3.getTelephone())
+                .build();
+
+        given(ownerMapper.ownerDtoToOwner(updatedOwnerDto3)).willReturn(updatedOwner3);
         given(ownerService.save(updatedOwner3)).willReturn(updatedOwner3);
         // When
         // Then
         mockMvc.perform(post("/owners/" + updatedOwner3.getId() + "/edit/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedOwner3))
+                        .flashAttr("ownerDto", updatedOwnerDto3)
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/owners/" + updatedOwner3.getId()))
