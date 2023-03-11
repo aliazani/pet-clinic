@@ -113,24 +113,24 @@ class OwnerMapServiceTest {
         assertNull(result);
     }
 
-    @DisplayName(value = "findAllByLastNameLike - existentLastName - returnsOwners")
+    @DisplayName(value = "findAllByLastNameLikeIgnoreCase_existent - existentLastName - returnsOwners")
     @Test
-    void findAllByLastNameLike_Existent() {
+    void findAllByLastNameLikeIgnoreCase_existent() {
         // given
-        String lastName = "Steven";
+        String lastName = "steven";
         // when
-        Set<Owner> result = ownerMapService.findAllByLastNameLike(lastName);
+        Set<Owner> result = ownerMapService.findAllByLastNameLikeIgnoreCase(lastName);
         // then
         assertEquals(2, result.size());
     }
 
-    @DisplayName(value = "findAllByLastNameLike - nonExistentLastName - returnsEmptySet")
+    @DisplayName(value = "findAllByLastNameLikeIgnoreCase_nonExistent - nonExistentLastName - returnsEmptySet")
     @Test
     void findAllByLastNameLike_nonExistent() {
         // given
         String lastName = "Not Found";
         // when
-        Set<Owner> result = ownerMapService.findAllByLastNameLike(lastName);
+        Set<Owner> result = ownerMapService.findAllByLastNameLikeIgnoreCase(lastName);
         // then
         assertThat(result).isEmpty();
     }
