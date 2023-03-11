@@ -1,5 +1,6 @@
 package com.learning.petclinic.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.petclinic.dto.OwnerDto;
 import com.learning.petclinic.mapper.OwnerMapper;
 import com.learning.petclinic.model.Owner;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
@@ -25,6 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class OwnerControllerTest {
     Set<OwnerDto> ownerDtos;
     OwnerDto ownerDto1;
@@ -40,6 +45,8 @@ class OwnerControllerTest {
     @Mock
     Model model;
 
+    ObjectMapper objectMapper;
+
     @InjectMocks
     OwnerController ownerController;
 
@@ -47,6 +54,7 @@ class OwnerControllerTest {
 
     @BeforeEach
     void setUp() {
+        objectMapper = new ObjectMapper();
         ownerDtos = new HashSet<>();
 
         ownerDto1 = OwnerDto.builder()
@@ -189,5 +197,101 @@ class OwnerControllerTest {
         ;
 
         verify(ownerService, times(1)).findById(1L);
+    }
+
+    @Test
+    void initCreationFrom() throws Exception {
+        // Given
+        // When
+        // Then
+        mockMvc.perform(get("/owners/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/createOrUpdateOwnerForm"))
+                .andExpect(model().attributeExists("ownerDto"));
+
+        verifyNoInteractions(ownerService);
+    }
+
+    @Test
+    void processCreationForm() throws Exception {
+        // Given
+        OwnerDto ownerDto4 = OwnerDto.builder()
+                .firstName("Lora")
+                .lastName("Jackson")
+                .city("Berlin")
+                .address("921 street.")
+                .telephone("0923712")
+                .build();
+
+        Owner owner4 = Owner.builder()
+                .firstName(ownerDto4.getFirstName())
+                .lastName(ownerDto4.getLastName())
+                .city(ownerDto4.getCity())
+                .address(ownerDto4.getAddress())
+                .telephone(ownerDto4.getTelephone())
+                .build();
+
+        given(ownerMapper.ownerDtoToOwner(any())).willReturn(owner4);
+        given(ownerService.save(owner4)).willReturn(owner4);
+        // When
+        // Then
+        mockMvc.perform(post("/owners/new")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(owner4))
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/owners/" + owner4.getId()))
+                .andExpect(model().attributeExists("ownerDto"));
+
+        verify(ownerService, times(1)).save(owner4);
+    }
+
+    @Test
+    void initUpdateFrom() throws Exception {
+        // Given
+        Owner owner4 = Owner.builder()
+                .id(4L)
+                .firstName("Rob")
+                .lastName("For")
+                .city("Amsterdam")
+                .address("821 street.")
+                .telephone("21232890")
+                .build();
+        given(ownerService.findById(owner4.getId())).willReturn(owner4);
+        // When
+        // Then
+        mockMvc.perform(get("/owners/" + owner4.getId() + "/edit"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/createOrUpdateOwnerForm"))
+                .andExpect(model().attributeExists("ownerDto"));
+
+        verify(ownerService, times(1)).findById(owner4.getId());
+    }
+
+    @Test
+    void processUpdateForm() throws Exception {
+        // Given
+        Owner updatedOwner3 = Owner.builder()
+                .id(3L)
+                .firstName("Michel")
+                .lastName("Fow")
+                .city("Amsterdam")
+                .address("19 street.")
+                .telephone("2123123890")
+                .build();
+
+        given(ownerMapper.ownerDtoToOwner(any())).willReturn(updatedOwner3);
+        given(ownerService.save(updatedOwner3)).willReturn(updatedOwner3);
+        // When
+        // Then
+        mockMvc.perform(post("/owners/" + updatedOwner3.getId() + "/edit/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedOwner3))
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/owners/" + updatedOwner3.getId()))
+                .andExpect(model().attributeExists("ownerDto"));
+
+        verify(ownerService, times(1)).save(updatedOwner3);
     }
 }
