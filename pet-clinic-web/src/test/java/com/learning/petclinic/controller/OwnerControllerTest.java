@@ -2,8 +2,11 @@ package com.learning.petclinic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.petclinic.dto.OwnerDto;
+import com.learning.petclinic.dto.PetDto;
 import com.learning.petclinic.mapper.OwnerMapper;
+import com.learning.petclinic.mapper.PetMapper;
 import com.learning.petclinic.model.Owner;
+import com.learning.petclinic.model.Pet;
 import com.learning.petclinic.service.OwnerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +45,9 @@ class OwnerControllerTest {
 
     @Mock
     OwnerMapper ownerMapper;
+
+    @Mock
+    PetMapper petMapper;
 
     @Mock
     Model model;
@@ -108,6 +115,18 @@ class OwnerControllerTest {
     @Test
     void processFindForm_returnsOneOwner() throws Exception {
         // given
+        Pet pet1 = Pet.builder()
+                .name("Gorge")
+                .birthDate(LocalDate.now())
+                .build();
+
+        PetDto petDto1 = PetDto.builder()
+                .name(pet1.getName())
+                .birthDate(pet1.getBirthDate())
+                .build();
+        Set<Pet> owner1Pets = new HashSet<>();
+        owner1Pets.add(pet1);
+
         Set<Owner> oneOwner = new HashSet<>();
         Owner owner1 = Owner.builder()
                 .id(ownerDto1.getId())
@@ -116,10 +135,12 @@ class OwnerControllerTest {
                 .city(ownerDto1.getCity())
                 .address(ownerDto1.getAddress())
                 .telephone(ownerDto1.getTelephone())
+                .pets(owner1Pets)
                 .build();
         oneOwner.add(owner1);
         given(ownerService.findAllByLastNameLikeIgnoreCase("dow")).willReturn(oneOwner);
         given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
+        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
         // when
         // then
         mockMvc.perform(get("/owners?lastName=" + ownerDto1.getLastName()))
@@ -134,6 +155,32 @@ class OwnerControllerTest {
     @Test
     void processFindForm_returnsManyOwner() throws Exception {
         // given
+        Pet pet1 = Pet.builder()
+                .name("Gorge")
+                .birthDate(LocalDate.now())
+                .build();
+
+        PetDto petDto1 = PetDto.builder()
+                .name(pet1.getName())
+                .birthDate(pet1.getBirthDate())
+                .build();
+
+        Pet pet2 = Pet.builder()
+                .name("Kitty")
+                .birthDate(LocalDate.now())
+                .build();
+
+        PetDto petDto2 = PetDto.builder()
+                .name(pet2.getName())
+                .birthDate(pet2.getBirthDate())
+                .build();
+
+        Set<Pet> owner2Pets = new HashSet<>();
+        owner2Pets.add(pet1);
+
+        Set<Pet> owner3Pets = new HashSet<>();
+        owner3Pets.add(pet2);
+
         Set<Owner> manyOwners = new HashSet<>();
         Owner owner2 = Owner.builder()
                 .id(ownerDto2.getId())
@@ -142,6 +189,7 @@ class OwnerControllerTest {
                 .city(ownerDto2.getCity())
                 .address(ownerDto2.getAddress())
                 .telephone(ownerDto2.getTelephone())
+                .pets(owner2Pets)
                 .build();
         Owner owner3 = Owner.builder()
                 .id(ownerDto3.getId())
@@ -150,16 +198,21 @@ class OwnerControllerTest {
                 .city(ownerDto3.getCity())
                 .address(ownerDto3.getAddress())
                 .telephone(ownerDto3.getTelephone())
+                .pets(owner3Pets)
                 .build();
         manyOwners.add(owner2);
         manyOwners.add(owner3);
         given(ownerService.findAllByLastNameLikeIgnoreCase("for")).willReturn(manyOwners);
+        given(ownerMapper.ownerToOwnerDto(owner2)).willReturn(ownerDto2);
+        given(ownerMapper.ownerToOwnerDto(owner3)).willReturn(ownerDto3);
+        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
+        given(petMapper.petToPetDto(pet2)).willReturn(petDto2);
         // when
         // then
         mockMvc.perform(get("/owners?lastName=" + ownerDto2.getLastName()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("owners/ownersList"))
-                .andExpect(model().attribute("owners", hasSize(2)))
+                .andExpect(model().attribute("ownerDtos", hasSize(2)))
         ;
         verify(ownerService, times(1)).findAllByLastNameLikeIgnoreCase("for");
     }
@@ -177,22 +230,23 @@ class OwnerControllerTest {
                 .build();
 
         given(ownerService.findById(1L)).willReturn(owner1);
+        given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
         // when
         // then
         mockMvc.perform(get("/owners/1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("owners/ownerDetails"))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("id", is(ownerDto1.getId()))))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("firstName", is(ownerDto1.getFirstName()))))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("lastName", is(ownerDto1.getLastName()))))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("city", is(ownerDto1.getCity()))))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("telephone", is(ownerDto1.getTelephone()))))
-                .andExpect(model().attribute("owner",
+                .andExpect(model().attribute("ownerDto",
                         hasProperty("address", is(ownerDto1.getAddress()))))
         ;
 
@@ -257,7 +311,18 @@ class OwnerControllerTest {
                 .address("821 street.")
                 .telephone("21232890")
                 .build();
+
+        OwnerDto ownerDto4 = OwnerDto.builder()
+                .id(owner4.getId())
+                .firstName(owner4.getFirstName())
+                .lastName(owner4.getLastName())
+                .city(owner4.getCity())
+                .address(owner4.getAddress())
+                .telephone(owner4.getTelephone())
+                .build();
+
         given(ownerService.findById(owner4.getId())).willReturn(owner4);
+        given(ownerMapper.ownerToOwnerDto(owner4)).willReturn(ownerDto4);
         // When
         // Then
         mockMvc.perform(get("/owners/" + owner4.getId() + "/edit"))
