@@ -1,6 +1,5 @@
 package com.learning.petclinic.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
