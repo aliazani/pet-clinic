@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(uses = {PetTypeMapper.class})
+@Mapper(uses = {PetTypeMapper.class, OwnerMapper.class})
 public interface PetMapper {
     @Mapping(target = "visits", ignore = true)
     Pet petDtoToPet(PetDto petDto);

@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper
+@Mapper(uses = PetMapper.class)
 public interface VisitMapper {
     Visit visitDtoToVisit(VisitDto visitDto);
 
