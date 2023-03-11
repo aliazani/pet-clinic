@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'vets')}"
+  lang="en"
+>
   <head>
     <meta charset="UTF-8" />
     <title>Veterinarian</title>
   </head>
+
   <body>
-    <h1 th:text="'List of Vets'">Vets</h1>
-    <table>
+    <h2>Veterinarians</h2>
+    <table id="vets" class="table table-striped">
       <thead>
         <tr>
           <th>Id</th>
@@ -15,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr th:each="vet: ${vets}">
+        <tr th:each="vet: ${listVets}">
           <td th:text="${vet.id}">id</td>
           <td th:text="${vet.firstName}">firstName</td>
           <td th:text="${vet.lastName}">lastName</td>

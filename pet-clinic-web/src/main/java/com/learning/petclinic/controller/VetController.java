@@ -17,7 +17,7 @@ public class VetController {
 
     @GetMapping("")
     public String listVets(Model model) {
-        model.addAttribute("vets", vetService.findAll());
+        model.addAttribute("listVets", vetService.findAll());
         return "vets/index";
     }
 }
