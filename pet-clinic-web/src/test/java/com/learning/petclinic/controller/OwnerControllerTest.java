@@ -1,8 +1,11 @@
 package com.learning.petclinic.controller;
 
+import com.learning.petclinic.dto.OwnerDto;
+import com.learning.petclinic.mapper.OwnerMapper;
 import com.learning.petclinic.model.Owner;
 import com.learning.petclinic.service.OwnerService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,19 +19,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class OwnerControllerTest {
-    Set<Owner> owners;
-    Owner owner1;
-    Owner owner2;
+    Set<OwnerDto> ownerDtos;
+    OwnerDto ownerDto1;
+    OwnerDto ownerDto2;
+    OwnerDto ownerDto3;
 
     @Mock
     OwnerService ownerService;
+
+    @Mock
+    OwnerMapper ownerMapper;
 
     @Mock
     Model model;
@@ -40,9 +47,10 @@ class OwnerControllerTest {
 
     @BeforeEach
     void setUp() {
-        owners = new HashSet<>();
+        ownerDtos = new HashSet<>();
 
-        owner1 = Owner.builder()
+        ownerDto1 = OwnerDto.builder()
+                .id(1L)
                 .firstName("John")
                 .lastName("Dow")
                 .city("Michigan")
@@ -50,7 +58,8 @@ class OwnerControllerTest {
                 .telephone("123456")
                 .build();
 
-        owner2 = Owner.builder()
+        ownerDto2 = OwnerDto.builder()
+                .id(2L)
                 .firstName("Steven")
                 .lastName("For")
                 .city("Tehran")
@@ -58,23 +67,20 @@ class OwnerControllerTest {
                 .telephone("1234567890")
                 .build();
 
-        owners.add(owner1);
-        owners.add(owner2);
+        ownerDto3 = OwnerDto.builder()
+                .id(3L)
+                .firstName("Rob")
+                .lastName("For")
+                .city("Amsterdam")
+                .address("821 street.")
+                .telephone("21232890")
+                .build();
+
+        ownerDtos.add(ownerDto1);
+        ownerDtos.add(ownerDto2);
+        ownerDtos.add(ownerDto3);
 
         mockMvc = MockMvcBuilders.standaloneSetup(ownerController).build();
-    }
-
-    @Test
-    void listOwners() throws Exception {
-        // given
-        given(ownerService.findAll()).willReturn(owners);
-        // when
-        // then
-        mockMvc.perform(get("/owners"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("owners/index"))
-                .andExpect(model().attribute("listOwners", hasSize(2)))
-        ;
     }
 
     @Test
@@ -84,14 +90,84 @@ class OwnerControllerTest {
         // then
         mockMvc.perform(get("/owners/find"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("owners/findOwners"));
+                .andExpect(view().name("owners/findOwners"))
+                .andExpect(model().attributeExists("owner"))
+        ;
+        verifyNoInteractions(ownerService);
     }
 
+    @DisplayName("findOwners - whenCalled - returnsOneOwner")
+    @Test
+    void processFindForm_returnsOneOwner() throws Exception {
+        // given
+        Set<Owner> oneOwner = new HashSet<>();
+        Owner owner1 = Owner.builder()
+                .id(ownerDto1.getId())
+                .firstName(ownerDto1.getFirstName())
+                .lastName(ownerDto1.getLastName())
+                .city(ownerDto1.getCity())
+                .address(ownerDto1.getAddress())
+                .telephone(ownerDto1.getTelephone())
+                .build();
+        oneOwner.add(owner1);
+        given(ownerService.findAllByLastNameLike("Dow")).willReturn(oneOwner);
+        given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
+        // when
+        // then
+        mockMvc.perform(get("/owners?lastName=" + ownerDto1.getLastName()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/owners/" + ownerDto1.getId()))
+        ;
+
+        verify(ownerService, times(1)).findAllByLastNameLike("Dow");
+    }
+
+    @DisplayName("findOwners - whenCalled - returnsManyOwners")
+    @Test
+    void processFindForm_returnsManyOwner() throws Exception {
+        // given
+        Set<Owner> manyOwners = new HashSet<>();
+        Owner owner2 = Owner.builder()
+                .id(ownerDto2.getId())
+                .firstName(ownerDto2.getFirstName())
+                .lastName(ownerDto2.getLastName())
+                .city(ownerDto2.getCity())
+                .address(ownerDto2.getAddress())
+                .telephone(ownerDto2.getTelephone())
+                .build();
+        Owner owner3 = Owner.builder()
+                .id(ownerDto3.getId())
+                .firstName(ownerDto3.getFirstName())
+                .lastName(ownerDto3.getLastName())
+                .city(ownerDto3.getCity())
+                .address(ownerDto3.getAddress())
+                .telephone(ownerDto3.getTelephone())
+                .build();
+        manyOwners.add(owner2);
+        manyOwners.add(owner3);
+        given(ownerService.findAllByLastNameLike("For")).willReturn(manyOwners);
+        // when
+        // then
+        mockMvc.perform(get("/owners?lastName=" + ownerDto2.getLastName()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/ownersList"))
+                .andExpect(model().attribute("owners", hasSize(2)))
+        ;
+        verify(ownerService, times(1)).findAllByLastNameLike("For");
+    }
 
     @Test
     void showOwner() throws Exception {
         // given
-        owner1.setId(1L);
+        Owner owner1 = Owner.builder()
+                .id(ownerDto1.getId())
+                .firstName(ownerDto1.getFirstName())
+                .lastName(ownerDto1.getLastName())
+                .city(ownerDto1.getCity())
+                .address(ownerDto1.getAddress())
+                .telephone(ownerDto1.getTelephone())
+                .build();
+
         given(ownerService.findById(1L)).willReturn(owner1);
         // when
         // then
@@ -99,17 +175,19 @@ class OwnerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("owners/ownerDetails"))
                 .andExpect(model().attribute("owner",
-                        hasProperty("id", is(owner1.getId()))))
+                        hasProperty("id", is(ownerDto1.getId()))))
                 .andExpect(model().attribute("owner",
-                        hasProperty("firstName", is(owner1.getFirstName()))))
+                        hasProperty("firstName", is(ownerDto1.getFirstName()))))
                 .andExpect(model().attribute("owner",
-                        hasProperty("lastName", is(owner1.getLastName()))))
+                        hasProperty("lastName", is(ownerDto1.getLastName()))))
                 .andExpect(model().attribute("owner",
-                        hasProperty("city", is(owner1.getCity()))))
+                        hasProperty("city", is(ownerDto1.getCity()))))
                 .andExpect(model().attribute("owner",
-                        hasProperty("telephone", is(owner1.getTelephone()))))
+                        hasProperty("telephone", is(ownerDto1.getTelephone()))))
                 .andExpect(model().attribute("owner",
-                        hasProperty("address", is(owner1.getAddress()))))
+                        hasProperty("address", is(ownerDto1.getAddress()))))
         ;
+
+        verify(ownerService, times(1)).findById(1L);
     }
 }
