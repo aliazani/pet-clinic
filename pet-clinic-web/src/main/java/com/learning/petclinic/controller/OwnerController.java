@@ -74,7 +74,13 @@ public class OwnerController {
 
     @GetMapping("/{ownerId}")
     public String showOwner(@PathVariable("ownerId") Long id, Model model) {
-        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(ownerService.findById(id));
+        Owner owner = ownerService.findById(id);
+
+        OwnerDto ownerDto = ownerMapper.ownerToOwnerDto(owner);
+        Set<PetDto> petDtos = new HashSet<>();
+        owner.getPets().forEach(pet -> petDtos.add(petMapper.petToPetDto(pet)));
+        ownerDto.setPets(petDtos);
+
         model.addAttribute("ownerDto", ownerDto);
         return VIEWS_OWNER_DETAILS;
     }
