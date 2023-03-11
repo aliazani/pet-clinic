@@ -13,7 +13,6 @@ import java.util.Set;
 public interface VisitMapper {
     // Single - with PetDTO(no link to VisitDTO)
     @Named("NoVisit")
-//    @Mapping(target = "pet", qualifiedByName = "NoVisit")
     @Mapping(target = "pet.visits", ignore = true)
     VisitDto toDTO(Visit visit);
 
@@ -34,7 +33,6 @@ public interface VisitMapper {
 
     // Single - with PetDTO(no link to VisitDTO)
     @Named("NoVisit")
-//    @Mapping(target = "pet", qualifiedByName = "NoVisit")
     @Mapping(target = "pet.visits", ignore = true)
     Visit toEntity(VisitDto visitDto);
 

@@ -11,14 +11,12 @@ public interface PetMapper {
     // Single - with visitDTO(no link to petDTO) - with OwnerDTO(no link to petDTO)
     @Named("NoPet")
     @Mapping(target = "visits", qualifiedByName = "NoPet")
-//    @Mapping(target = "owner", qualifiedByName = "NoPet")
     @Mapping(target = "owner.pets", ignore = true)
     PetDto toDTO(Pet pet);
 
     // Single - without visitDTO - with OwnerDTO(no link to petDTO)
     @Named("NoVisit")
     @Mapping(target = "visits", ignore = true)
-//    @Mapping(target = "owner", qualifiedByName = "NoPet")
     @Mapping(target = "owner.pets", ignore = true)
     PetDto toDTONoVisit(Pet pet);
 
@@ -47,14 +45,12 @@ public interface PetMapper {
     @Named("NoPet")
     @Mapping(target = "visits", qualifiedByName = "NoPet")
     @Mapping(target = "owner.pets", ignore = true)
-//    @Mapping(target = "owner", qualifiedByName = "NoPet")
     Pet toEntity(PetDto petDto);
 
     // Single - without visit - with Owner(no link to pet)
     @Named("NoVisit")
     @Mapping(target = "visits", ignore = true)
     @Mapping(target = "owner.pets", ignore = true)
-//    @Mapping(target = "owner", qualifiedByName = "NoPet")
     Pet toEntityNoVisit(PetDto petDto);
 
     // Single - with visit(no link to pet) - without Owner
