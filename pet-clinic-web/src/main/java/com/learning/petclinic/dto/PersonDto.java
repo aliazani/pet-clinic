@@ -2,6 +2,8 @@ package com.learning.petclinic.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
+
 
 @Getter
 @Setter
@@ -14,6 +16,8 @@ public class PersonDto extends BaseDto {
         this.lastName = lastName;
     }
 
+    @NotEmpty
     private String firstName;
+    @NotEmpty
     private String lastName;
 }

@@ -62,7 +62,7 @@ class VisitControllerTest {
                 .lastName("Dow")
                 .city("Michigan")
                 .address("43 street.")
-                .telephone("123456")
+                .telephone("6085551023")
                 .build();
 
         pet1 = Pet.builder()

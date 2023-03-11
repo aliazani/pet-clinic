@@ -2,6 +2,8 @@ package com.learning.petclinic.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,8 +24,14 @@ public class OwnerDto extends PersonDto {
         this.pets = pets;
     }
 
+    @NotEmpty
     private String address;
+
+    @NotEmpty
     private String city;
+
+    @NotEmpty
+    @Digits(fraction = 0, integer = 10)
     private String telephone;
     private Set<PetDto> pets = new HashSet<>();
 }

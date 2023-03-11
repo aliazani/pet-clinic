@@ -2,6 +2,8 @@ package com.learning.petclinic.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -12,6 +14,7 @@ public class NamedDto extends BaseDto {
         this.name = name;
     }
 
+    @NotEmpty
     private String name;
 
     @Override

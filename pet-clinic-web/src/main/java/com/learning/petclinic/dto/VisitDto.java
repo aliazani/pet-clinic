@@ -3,6 +3,7 @@ package com.learning.petclinic.dto;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 
 @Setter
@@ -20,6 +21,8 @@ public class VisitDto extends BaseDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
+    @NotEmpty
     private String description;
     private PetDto pet;
 }
