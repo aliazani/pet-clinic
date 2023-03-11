@@ -15,7 +15,7 @@ import org.springframework.ui.Model;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.BDDMockito.given;
@@ -85,5 +85,31 @@ class OwnerControllerTest {
         mockMvc.perform(get("/owners/find"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("owners/findOwners"));
+    }
+
+
+    @Test
+    void showOwner() throws Exception {
+        // given
+        owner1.setId(1L);
+        given(ownerService.findById(1L)).willReturn(owner1);
+        // when
+        // then
+        mockMvc.perform(get("/owners/1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/ownerDetails"))
+                .andExpect(model().attribute("owner",
+                        hasProperty("id", is(owner1.getId()))))
+                .andExpect(model().attribute("owner",
+                        hasProperty("firstName", is(owner1.getFirstName()))))
+                .andExpect(model().attribute("owner",
+                        hasProperty("lastName", is(owner1.getLastName()))))
+                .andExpect(model().attribute("owner",
+                        hasProperty("city", is(owner1.getCity()))))
+                .andExpect(model().attribute("owner",
+                        hasProperty("telephone", is(owner1.getTelephone()))))
+                .andExpect(model().attribute("owner",
+                        hasProperty("address", is(owner1.getAddress()))))
+        ;
     }
 }
