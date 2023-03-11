@@ -50,15 +50,22 @@ public class DataLoader implements CommandLineRunner {
         owner1.setCity("Miami");
         owner1.setTelephone("123456");
 
-        Pet johnDog = new Pet();
-        johnDog.setName("Georgy");
-        johnDog.setOwner(owner1);
-        johnDog.setPetType(dog);
-        johnDog.setBirthDate(LocalDate.now());
-        owner1.getPets().add(johnDog);
+        Pet owner1Pet = new Pet();
+        owner1Pet.setName("Georgy");
+        owner1Pet.setOwner(owner1);
+        owner1Pet.setPetType(dog);
+        owner1Pet.setBirthDate(LocalDate.now());
+
+        Visit owner1PetVisit1 = new Visit();
+        owner1PetVisit1.setDate(LocalDate.now());
+        owner1PetVisit1.setDescription("John's dog first visit.");
+        owner1PetVisit1.setPet(owner1Pet);
+
+        owner1.getPets().add(owner1Pet);
+        owner1Pet.getVisits().add(owner1PetVisit1);
 
         ownerService.save(owner1);
-        petService.save(johnDog);
+        petService.save(owner1Pet);
 
         Owner owner2 = new Owner();
         owner2.setFirstName("Markus");
@@ -67,34 +74,59 @@ public class DataLoader implements CommandLineRunner {
         owner2.setCity("Florida");
         owner2.setTelephone("98765");
 
-        Pet markusCat = new Pet();
-        markusCat.setName("Fiona");
-        markusCat.setPetType(cat);
-        markusCat.setOwner(owner2);
-        markusCat.setBirthDate(LocalDate.now());
+        Pet owner2Pet = new Pet();
+        owner2Pet.setName("Fiona");
+        owner2Pet.setPetType(cat);
+        owner2Pet.setOwner(owner2);
+        owner2Pet.setBirthDate(LocalDate.now());
         ownerService.save(owner2);
-        petService.save(markusCat);
+        petService.save(owner2Pet);
 
-        Visit visit1 = new Visit();
-        visit1.setDate(LocalDate.now());
-        visit1.setDescription("first visit to check if the cat is healthy or not.");
-        visit1.setPet(markusCat);
+        Visit owner2PetVisit1 = new Visit();
+        owner2PetVisit1.setDate(LocalDate.now());
+        owner2PetVisit1.setDescription("first visit to check if the cat is healthy or not.");
+        owner2PetVisit1.setPet(owner2Pet);
 
-        Visit visit2 = new Visit();
-        visit2.setDate(LocalDate.now());
-        visit2.setDescription("second visit to the broken legs.");
-        visit2.setPet(markusCat);
+        Visit owner2PetVisit2 = new Visit();
+        owner2PetVisit2.setDate(LocalDate.now());
+        owner2PetVisit2.setDescription("second visit to the broken legs.");
+        owner2PetVisit2.setPet(owner2Pet);
 
-        visitService.save(visit1);
-        visitService.save(visit2);
+        visitService.save(owner2PetVisit1);
+        visitService.save(owner2PetVisit2);
 
-        markusCat.getVisits().add(visit1);
-        markusCat.getVisits().add(visit2);
-        owner2.getPets().add(markusCat);
+        owner2Pet.getVisits().add(owner2PetVisit1);
+        owner2Pet.getVisits().add(owner2PetVisit2);
+        owner2.getPets().add(owner2Pet);
 
         ownerService.save(owner2);
-        petService.save(markusCat);
+        petService.save(owner2Pet);
 
+        Owner owner3 = new Owner();
+        owner3.setFirstName("Jeff");
+        owner3.setLastName("Sophia");
+        owner3.setAddress("Love street");
+        owner3.setCity("Chicago");
+        owner3.setTelephone("828312");
+
+        Pet owner3Pet = new Pet();
+        owner3Pet.setName("Jeffy");
+        owner3Pet.setPetType(dog);
+        owner3Pet.setOwner(owner3);
+        owner3Pet.setBirthDate(LocalDate.now());
+
+        Visit owner3PetVisit1 = new Visit();
+        owner3PetVisit1.setDate(LocalDate.now());
+        owner3PetVisit1.setDescription("first visit to check if the dog is healthy or not.");
+        owner3PetVisit1.setPet(owner3Pet);
+
+        owner3.getPets().add(owner3Pet);
+        owner3Pet.getVisits().add(owner3PetVisit1);
+
+        visitService.save(owner3PetVisit1);
+
+        petService.save(owner3Pet);
+        ownerService.save(owner3);
 
         Speciality surgery = new Speciality();
         surgery.setName("Surgery");
