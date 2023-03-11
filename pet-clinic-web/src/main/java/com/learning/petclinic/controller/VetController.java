@@ -15,9 +15,9 @@ public class VetController {
         this.vetService = vetService;
     }
 
-    @GetMapping({"", "index", "index.html"})
+    @GetMapping({"", "vetList.html", "vetList"})
     public String listVets(Model model) {
         model.addAttribute("vets", vetService.findAll());
-        return "vets/index";
+        return "vets/vetList";
     }
 }
