@@ -38,6 +38,7 @@ class OwnerJpaServiceTest {
     @BeforeEach
     void setUp() {
         owner1 = Owner.builder()
+                .id(1L)
                 .firstName("Richard")
                 .lastName("Stallman")
                 .city("Michigan")
@@ -46,6 +47,7 @@ class OwnerJpaServiceTest {
                 .build();
 
         owner2 = Owner.builder()
+                .id(2L)
                 .firstName("Carlos")
                 .lastName("Stallman")
                 .city("NewYork")
@@ -54,6 +56,7 @@ class OwnerJpaServiceTest {
                 .build();
 
         owner3 = Owner.builder()
+                .id(3L)
                 .firstName("Robert")
                 .lastName("Martin")
                 .city("Bayern")
@@ -79,7 +82,6 @@ class OwnerJpaServiceTest {
     @Test
     void findById() {
         // given
-        owner1.setId(1L);
         given(ownerRepository.findById(1L)).willReturn(Optional.ofNullable(owner1));
         // when
         Owner foundOwner = ownerJpaService.findById(1L);

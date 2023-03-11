@@ -1,6 +1,5 @@
 package com.learning.petclinic.service.jpa;
 
-import com.learning.petclinic.model.PetType;
 import com.learning.petclinic.model.Speciality;
 import com.learning.petclinic.repository.SpecialityRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +34,10 @@ class SpecialityJpaServiceTest {
 
     @BeforeEach
     void setUp() {
-        speciality = new Speciality();
-        speciality.setName("Surgery");
+        speciality = Speciality.builder()
+                .id(1L)
+                .name("Surgery")
+                .build();
     }
 
     @Test
@@ -56,7 +57,6 @@ class SpecialityJpaServiceTest {
     @Test
     void findById() {
         // given
-        speciality.setId(1L);
         given(specialityRepository.findById(1L)).willReturn(Optional.ofNullable(speciality));
         // when
         Speciality foundSpeciality = specialityJpaService.findById(1L);

@@ -50,11 +50,14 @@ class VisitJpaServiceTest {
 
     @BeforeEach
     void setUp() {
-        petType = new PetType();
-        petType.setName("Dog");
+        petType = PetType.builder()
+                .id(1L)
+                .name("Dog")
+                .build();
         petTypeJpaService.save(petType);
 
         owner = Owner.builder()
+                .id(1L)
                 .firstName("Richard")
                 .lastName("Stallman")
                 .city("New York")
@@ -64,6 +67,7 @@ class VisitJpaServiceTest {
         ownerJpaService.save(owner);
 
         pet = Pet.builder()
+                .id(1L)
                 .name("Gorge")
                 .birthDate(LocalDate.now())
                 .owner(owner)
@@ -72,6 +76,7 @@ class VisitJpaServiceTest {
         petJpaService.save(pet);
 
         visit = Visit.builder()
+                .id(1L)
                 .description("Health check.")
                 .date(LocalDate.now())
                 .pet(pet)
@@ -95,7 +100,6 @@ class VisitJpaServiceTest {
     @Test
     void findById() {
         // given
-        visit.setId(1L);
         given(visitRepository.findById(1L)).willReturn(Optional.ofNullable(visit));
         // when
         Visit foundVisit = visitJpaService.findById(1L);

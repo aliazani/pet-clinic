@@ -81,9 +81,10 @@ class VisitMapServiceTest {
     void save() {
         // given
         Long id = 2L;
-        Visit visit2 = new Visit();
-        visit2.setDate(LocalDate.now());
-        visit2.setDescription("Health check.");
+        Visit visit2 = Visit.builder()
+                .date(LocalDate.now())
+                .description("Health check.")
+                .build();
         // when
         Visit savedVisit = visitMapService.save(visit2);
         // then
