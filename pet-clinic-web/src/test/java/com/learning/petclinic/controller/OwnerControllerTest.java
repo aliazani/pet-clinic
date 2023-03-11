@@ -1,10 +1,8 @@
 package com.learning.petclinic.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.petclinic.dto.OwnerDto;
 import com.learning.petclinic.dto.PetDto;
 import com.learning.petclinic.mapper.OwnerMapper;
-import com.learning.petclinic.mapper.PetMapper;
 import com.learning.petclinic.model.Owner;
 import com.learning.petclinic.model.Pet;
 import com.learning.petclinic.service.OwnerService;
@@ -17,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
@@ -25,6 +22,8 @@ import org.springframework.ui.Model;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -39,6 +38,11 @@ class OwnerControllerTest {
     OwnerDto ownerDto1;
     OwnerDto ownerDto2;
     OwnerDto ownerDto3;
+    Set<PetDto> owner1PetDtos;
+    PetDto petDto1;
+    PetDto petDto2;
+    Pet pet1;
+    Pet pet2;
 
     @Mock
     OwnerService ownerService;
@@ -47,12 +51,7 @@ class OwnerControllerTest {
     OwnerMapper ownerMapper;
 
     @Mock
-    PetMapper petMapper;
-
-    @Mock
     Model model;
-
-    ObjectMapper objectMapper;
 
     @InjectMocks
     OwnerController ownerController;
@@ -61,7 +60,6 @@ class OwnerControllerTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
         ownerDtos = new HashSet<>();
 
         ownerDto1 = OwnerDto.builder()
@@ -91,6 +89,31 @@ class OwnerControllerTest {
                 .telephone("21232890")
                 .build();
 
+        owner1PetDtos = new HashSet<>();
+
+        petDto1 = PetDto.builder()
+                .name("Gorge")
+                .birthDate(LocalDate.now())
+                .build();
+
+        pet1 = Pet.builder()
+                .name(petDto1.getName())
+                .birthDate(petDto1.getBirthDate())
+                .build();
+
+        pet2 = Pet.builder()
+                .name("Kitty")
+                .birthDate(LocalDate.now())
+                .build();
+
+        petDto2 = PetDto.builder()
+                .name(pet2.getName())
+                .birthDate(pet2.getBirthDate())
+                .build();
+
+        owner1PetDtos.add(petDto1);
+
+        ownerDto1.setPets(owner1PetDtos);
         ownerDtos.add(ownerDto1);
         ownerDtos.add(ownerDto2);
         ownerDtos.add(ownerDto3);
@@ -115,19 +138,7 @@ class OwnerControllerTest {
     @Test
     void processFindForm_returnsOneOwner() throws Exception {
         // given
-        Pet pet1 = Pet.builder()
-                .name("Gorge")
-                .birthDate(LocalDate.now())
-                .build();
-
-        PetDto petDto1 = PetDto.builder()
-                .name(pet1.getName())
-                .birthDate(pet1.getBirthDate())
-                .build();
-        Set<Pet> owner1Pets = new HashSet<>();
-        owner1Pets.add(pet1);
-
-        Set<Owner> oneOwner = new HashSet<>();
+        Set<Owner> owners = new HashSet<>();
         Owner owner1 = Owner.builder()
                 .id(ownerDto1.getId())
                 .firstName(ownerDto1.getFirstName())
@@ -135,12 +146,11 @@ class OwnerControllerTest {
                 .city(ownerDto1.getCity())
                 .address(ownerDto1.getAddress())
                 .telephone(ownerDto1.getTelephone())
-                .pets(owner1Pets)
+                .pets(Stream.of(pet1).collect(Collectors.toSet()))
                 .build();
-        oneOwner.add(owner1);
-        given(ownerService.findAllByLastNameLikeIgnoreCase("dow")).willReturn(oneOwner);
-        given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
-        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
+        owners.add(owner1);
+        given(ownerService.findAllByLastNameLikeIgnoreCase("dow")).willReturn(owners);
+        given(ownerMapper.toDTOSet(owners)).willReturn(Stream.of(ownerDto1).collect(Collectors.toSet()));
         // when
         // then
         mockMvc.perform(get("/owners?lastName=" + ownerDto1.getLastName()))
@@ -155,33 +165,8 @@ class OwnerControllerTest {
     @Test
     void processFindForm_returnsManyOwner() throws Exception {
         // given
-        Pet pet1 = Pet.builder()
-                .name("Gorge")
-                .birthDate(LocalDate.now())
-                .build();
-
-        PetDto petDto1 = PetDto.builder()
-                .name(pet1.getName())
-                .birthDate(pet1.getBirthDate())
-                .build();
-
-        Pet pet2 = Pet.builder()
-                .name("Kitty")
-                .birthDate(LocalDate.now())
-                .build();
-
-        PetDto petDto2 = PetDto.builder()
-                .name(pet2.getName())
-                .birthDate(pet2.getBirthDate())
-                .build();
-
-        Set<Pet> owner2Pets = new HashSet<>();
-        owner2Pets.add(pet1);
-
-        Set<Pet> owner3Pets = new HashSet<>();
-        owner3Pets.add(pet2);
-
-        Set<Owner> manyOwners = new HashSet<>();
+        Set<Pet> owner2Pets = Stream.of(pet1).collect(Collectors.toSet());
+        Set<Pet> owner3Pets = Stream.of(pet2).collect(Collectors.toSet());
         Owner owner2 = Owner.builder()
                 .id(ownerDto2.getId())
                 .firstName(ownerDto2.getFirstName())
@@ -200,13 +185,10 @@ class OwnerControllerTest {
                 .telephone(ownerDto3.getTelephone())
                 .pets(owner3Pets)
                 .build();
-        manyOwners.add(owner2);
-        manyOwners.add(owner3);
+
+        Set<Owner> manyOwners = Stream.of(owner2, owner3).collect(Collectors.toSet());
         given(ownerService.findAllByLastNameLikeIgnoreCase("for")).willReturn(manyOwners);
-        given(ownerMapper.ownerToOwnerDto(owner2)).willReturn(ownerDto2);
-        given(ownerMapper.ownerToOwnerDto(owner3)).willReturn(ownerDto3);
-        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
-        given(petMapper.petToPetDto(pet2)).willReturn(petDto2);
+        given(ownerMapper.toDTOSet(manyOwners)).willReturn(Stream.of(ownerDto2, ownerDto3).collect(Collectors.toSet()));
         // when
         // then
         mockMvc.perform(get("/owners?lastName=" + ownerDto2.getLastName()))
@@ -244,8 +226,7 @@ class OwnerControllerTest {
                 .build();
 
         given(ownerService.findById(1L)).willReturn(owner1);
-        given(ownerMapper.ownerToOwnerDto(owner1)).willReturn(ownerDto1);
-        given(petMapper.petToPetDto(pet1)).willReturn(petDto1);
+        given(ownerMapper.toDTO(owner1)).willReturn(ownerDto1);
         // when
         // then
         mockMvc.perform(get("/owners/1"))
@@ -300,7 +281,7 @@ class OwnerControllerTest {
                 .telephone(ownerDto4.getTelephone())
                 .build();
 
-        given(ownerMapper.ownerDtoToOwner(ownerDto4)).willReturn(owner4);
+        given(ownerMapper.toEntityNoPet(ownerDto4)).willReturn(owner4);
         given(ownerService.save(owner4)).willReturn(owner4);
         // When
         // Then
@@ -336,7 +317,7 @@ class OwnerControllerTest {
                 .build();
 
         given(ownerService.findById(owner4.getId())).willReturn(owner4);
-        given(ownerMapper.ownerToOwnerDto(owner4)).willReturn(ownerDto4);
+        given(ownerMapper.toDTO(owner4)).willReturn(ownerDto4);
         // When
         // Then
         mockMvc.perform(get("/owners/" + owner4.getId() + "/edit"))
@@ -368,7 +349,7 @@ class OwnerControllerTest {
                 .telephone(updatedOwner3.getTelephone())
                 .build();
 
-        given(ownerMapper.ownerDtoToOwner(updatedOwnerDto3)).willReturn(updatedOwner3);
+        given(ownerMapper.toEntity(updatedOwnerDto3)).willReturn(updatedOwner3);
         given(ownerService.save(updatedOwner3)).willReturn(updatedOwner3);
         // When
         // Then

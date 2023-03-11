@@ -17,6 +17,8 @@ public class OwnerDto extends PersonDto {
         this.address = address;
         this.city = city;
         this.telephone = telephone;
+        if (pets == null)
+            pets = new HashSet<>();
         this.pets = pets;
     }
 
