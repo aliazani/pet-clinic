@@ -39,6 +39,9 @@ class OwnerControllerTest {
     OwnerDto ownerDto2;
     OwnerDto ownerDto3;
     Set<PetDto> owner1PetDtos;
+    Owner owner1;
+    Owner owner2;
+    Owner owner3;
     PetDto petDto1;
     PetDto petDto2;
     Pet pet1;
@@ -69,6 +72,17 @@ class OwnerControllerTest {
                 .city("Michigan")
                 .address("43 street.")
                 .telephone("123456")
+                .pets(Stream.of(petDto2).collect(Collectors.toSet()))
+                .build();
+
+        owner1 = Owner.builder()
+                .id(ownerDto1.getId())
+                .firstName(ownerDto1.getFirstName())
+                .lastName(ownerDto1.getLastName())
+                .city(ownerDto1.getCity())
+                .address(ownerDto1.getAddress())
+                .telephone(ownerDto1.getTelephone())
+                .pets(Stream.of(pet1).collect(Collectors.toSet()))
                 .build();
 
         ownerDto2 = OwnerDto.builder()
@@ -78,6 +92,16 @@ class OwnerControllerTest {
                 .city("Tehran")
                 .address("Enghelab street.")
                 .telephone("1234567890")
+                .pets(Stream.of(petDto1).collect(Collectors.toSet()))
+                .build();
+
+        owner2 = Owner.builder()
+                .id(ownerDto2.getId())
+                .firstName(ownerDto2.getFirstName())
+                .lastName(ownerDto2.getLastName())
+                .city(ownerDto2.getCity())
+                .address(ownerDto2.getAddress())
+                .telephone(ownerDto2.getTelephone())
                 .build();
 
         ownerDto3 = OwnerDto.builder()
@@ -87,6 +111,16 @@ class OwnerControllerTest {
                 .city("Amsterdam")
                 .address("821 street.")
                 .telephone("21232890")
+                .pets(Stream.of(petDto2).collect(Collectors.toSet()))
+                .build();
+
+        owner3 = Owner.builder()
+                .id(ownerDto3.getId())
+                .firstName(ownerDto3.getFirstName())
+                .lastName(ownerDto3.getLastName())
+                .city(ownerDto3.getCity())
+                .address(ownerDto3.getAddress())
+                .telephone(ownerDto3.getTelephone())
                 .build();
 
         owner1PetDtos = new HashSet<>();
@@ -138,18 +172,9 @@ class OwnerControllerTest {
     @Test
     void processFindForm_returnsOneOwner() throws Exception {
         // given
-        Set<Owner> owners = new HashSet<>();
-        Owner owner1 = Owner.builder()
-                .id(ownerDto1.getId())
-                .firstName(ownerDto1.getFirstName())
-                .lastName(ownerDto1.getLastName())
-                .city(ownerDto1.getCity())
-                .address(ownerDto1.getAddress())
-                .telephone(ownerDto1.getTelephone())
-                .pets(Stream.of(pet1).collect(Collectors.toSet()))
-                .build();
-        owners.add(owner1);
-        given(ownerService.findAllByLastNameLikeIgnoreCase("dow")).willReturn(owners);
+        Set<Owner> owners = Stream.of(owner1).collect(Collectors.toSet());
+        given(ownerService.findAllByLastNameLikeIgnoreCase("dow"))
+                .willReturn(owners);
         given(ownerMapper.toDTOSet(owners)).willReturn(Stream.of(ownerDto1).collect(Collectors.toSet()));
         // when
         // then
@@ -168,21 +193,10 @@ class OwnerControllerTest {
         Set<Pet> owner2Pets = Stream.of(pet1).collect(Collectors.toSet());
         Set<Pet> owner3Pets = Stream.of(pet2).collect(Collectors.toSet());
         Owner owner2 = Owner.builder()
-                .id(ownerDto2.getId())
-                .firstName(ownerDto2.getFirstName())
-                .lastName(ownerDto2.getLastName())
-                .city(ownerDto2.getCity())
-                .address(ownerDto2.getAddress())
-                .telephone(ownerDto2.getTelephone())
                 .pets(owner2Pets)
                 .build();
+
         Owner owner3 = Owner.builder()
-                .id(ownerDto3.getId())
-                .firstName(ownerDto3.getFirstName())
-                .lastName(ownerDto3.getLastName())
-                .city(ownerDto3.getCity())
-                .address(ownerDto3.getAddress())
-                .telephone(ownerDto3.getTelephone())
                 .pets(owner3Pets)
                 .build();
 
@@ -197,6 +211,24 @@ class OwnerControllerTest {
                 .andExpect(model().attribute("ownerDtos", hasSize(2)))
         ;
         verify(ownerService, times(1)).findAllByLastNameLikeIgnoreCase("for");
+    }
+
+    @DisplayName("findOwners - whenCalled - returnsAllOwners")
+    @Test
+    void processFindForm_returnsAllOwner() throws Exception {
+        Set<Owner> allOwners = Stream.of(owner1, owner2, owner3).collect(Collectors.toSet());
+
+        given(ownerService.findAllByLastNameLikeIgnoreCase(""))
+                .willReturn(allOwners);
+        given(ownerMapper.toDTOSet(allOwners)).willReturn(ownerDtos);
+        // when
+        // then
+        mockMvc.perform(get("/owners?lastName="))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/ownersList"))
+                .andExpect(model().attribute("ownerDtos", hasSize(3)))
+        ;
+        verify(ownerService, times(1)).findAllByLastNameLikeIgnoreCase("");
     }
 
     @Test
