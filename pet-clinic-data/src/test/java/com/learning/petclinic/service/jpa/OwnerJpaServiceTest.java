@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -24,7 +25,10 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OwnerJpaServiceTest {
-    Owner owner;
+    Owner owner1;
+    Owner owner2;
+    Owner owner3;
+
     @Mock
     OwnerRepository ownerRepository;
 
@@ -33,12 +37,28 @@ class OwnerJpaServiceTest {
 
     @BeforeEach
     void setUp() {
-        owner = Owner.builder()
+        owner1 = Owner.builder()
                 .firstName("Richard")
                 .lastName("Stallman")
                 .city("Michigan")
                 .address("43 street.")
                 .telephone("123456")
+                .build();
+
+        owner2 = Owner.builder()
+                .firstName("Carlos")
+                .lastName("Stallman")
+                .city("NewYork")
+                .address("apple street.")
+                .telephone("1123123124")
+                .build();
+
+        owner3 = Owner.builder()
+                .firstName("Robert")
+                .lastName("Martin")
+                .city("Bayern")
+                .address("492 street.")
+                .telephone("3892973423")
                 .build();
     }
 
@@ -46,7 +66,7 @@ class OwnerJpaServiceTest {
     void findAll() {
         // given
         Set<Owner> owners = new HashSet<>();
-        owners.add(owner);
+        owners.add(owner1);
         given(ownerRepository.findAll()).willReturn(owners);
         // when
         Set<Owner> foundOwners = ownerJpaService.findAll();
@@ -59,8 +79,8 @@ class OwnerJpaServiceTest {
     @Test
     void findById() {
         // given
-        owner.setId(1L);
-        given(ownerRepository.findById(1L)).willReturn(Optional.ofNullable(owner));
+        owner1.setId(1L);
+        given(ownerRepository.findById(1L)).willReturn(Optional.ofNullable(owner1));
         // when
         Owner foundOwner = ownerJpaService.findById(1L);
         // then
@@ -79,11 +99,11 @@ class OwnerJpaServiceTest {
         verify(ownerRepository, times(1)).findById(anyLong());
     }
 
-    @DisplayName(value = "findByLastName - existentId - returnsOwner")
+    @DisplayName(value = "findByLastName - existentLastName - returnsOwner")
     @Test
     void findByLastName() {
         // given
-        given(ownerRepository.findByLastName("Stallman")).willReturn(java.util.Optional.ofNullable(owner));
+        given(ownerRepository.findByLastName("Stallman")).willReturn(java.util.Optional.ofNullable(owner1));
         // when
         Owner foundOwner = ownerJpaService.findByLastName("Stallman");
         // then
@@ -92,7 +112,7 @@ class OwnerJpaServiceTest {
     }
 
 
-    @DisplayName(value = "findByLastName - nonExistentId - returnsNull")
+    @DisplayName(value = "findByLastName - nonExistentLastName - returnsNull")
     @Test
     void findByLastName_nonExistentLastName() {
         // given
@@ -103,11 +123,38 @@ class OwnerJpaServiceTest {
         verify(ownerRepository, times(1)).findByLastName("NonExistent");
     }
 
+    @DisplayName(value = "findAllByLastNameLike - existentLastName - returnsEmptySet")
+    @Test
+    void findAllByLastNameLike_existent() {
+        // given
+        Set<Owner> returnedFoundOwners = new HashSet<Owner>();
+        returnedFoundOwners.add(owner1);
+        returnedFoundOwners.add(owner2);
+        given(ownerRepository.findAllByLastNameLike("Stallman")).willReturn(returnedFoundOwners);
+        // when
+        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLike("Stallman");
+        // then
+        assertEquals(2, foundOwners.size());
+        verify(ownerRepository, times(1)).findAllByLastNameLike("Stallman");
+    }
+
+    @DisplayName(value = "findAllByLastNameLike - nonExistentLastName - returnsEmptySet")
+    @Test
+    void findAllByLastNameLike_nonExistent() {
+        // given
+        given(ownerRepository.findAllByLastNameLike("NonExistent")).willReturn(new HashSet<Owner>());
+        // when
+        Set<Owner> foundOwners = ownerJpaService.findAllByLastNameLike("NonExistent");
+        // then
+        assertThat(foundOwners).isEmpty();
+        verify(ownerRepository, times(1)).findAllByLastNameLike("NonExistent");
+    }
+
     @Test
     void delete() {
         // given
         // when
-        ownerJpaService.delete(owner);
+        ownerJpaService.delete(owner1);
         // then
         verify(ownerRepository, times(1)).delete(any(Owner.class));
     }
@@ -125,9 +172,9 @@ class OwnerJpaServiceTest {
     @Test
     void save() {
         // given
-        given(ownerRepository.save(owner)).willReturn(owner);
+        given(ownerRepository.save(owner1)).willReturn(owner1);
         // when
-        Owner savedOwner = ownerJpaService.save(owner);
+        Owner savedOwner = ownerJpaService.save(owner1);
         // then
         assertNotNull(savedOwner);
         verify(ownerRepository, times(1)).save(ArgumentMatchers.any(Owner.class));
