@@ -1,13 +1,9 @@
 package com.learning.petclinic.model;
 
-public class Speciality extends BaseEntity {
-    private String description;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+@Entity
+@Table(name = "specialties")
+public class Speciality extends NamedEntity {
 }
