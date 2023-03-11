@@ -28,6 +28,12 @@ public class VisitMapService extends AbstractMapService<Visit, Long> implements 
 
     @Override
     public Visit save(Visit item) {
+        if (map.get(item.getId()) != null) {
+            var existentItem = map.get(item.getId());
+            existentItem.setPet(item.getPet());
+            existentItem.setDate(item.getDate());
+            existentItem.setDescription(item.getDescription());
+        }
         return super.save(item);
     }
 

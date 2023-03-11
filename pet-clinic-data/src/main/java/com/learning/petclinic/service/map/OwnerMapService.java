@@ -38,6 +38,14 @@ public class OwnerMapService extends AbstractMapService<Owner, Long> implements 
 
     @Override
     public Owner save(Owner item) {
+        if (map.get(item.getId()) != null) {
+            var existentItem = map.get(item.getId());
+            existentItem.setFirstName(item.getFirstName());
+            existentItem.setLastName(item.getLastName());
+            existentItem.setCity(item.getCity());
+            existentItem.setAddress(item.getAddress());
+            existentItem.setTelephone(item.getTelephone());
+        }
         return super.save(item);
     }
 

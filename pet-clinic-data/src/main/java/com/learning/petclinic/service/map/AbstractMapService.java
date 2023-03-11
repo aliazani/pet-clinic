@@ -16,7 +16,7 @@ public abstract class AbstractMapService<T extends BaseEntity, I extends Long> {
     }
 
     T save(T item) {
-        if (item != null && item.getId() == null) {
+        if (item.getId() == null) {
             item.setId(getNextId());
             map.put(item.getId(), item);
         }
